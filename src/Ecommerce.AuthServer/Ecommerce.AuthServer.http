@@ -1,0 +1,6 @@
+@Ecommerce.AuthServer_HostAddress = http://localhost:5094
+
+GET {{Ecommerce.AuthServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

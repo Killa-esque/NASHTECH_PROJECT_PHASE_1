@@ -1,0 +1,19 @@
+{
+  "name": "Ecommerce.CustomerApp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "css:build": "npx tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/styles.css --minify",
+    "css:watch": "npx tailwindcss -i ./wwwroot/css/site.css -o ./wwwroot/css/styles.css --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "3"
+  },
+  "dependencies": {
+    "slick-carousel": "^1.8.1",
+    "swiper": "^11.2.6"
+  }
+}

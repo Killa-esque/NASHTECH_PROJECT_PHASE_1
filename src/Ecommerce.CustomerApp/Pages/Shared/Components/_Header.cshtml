@@ -1,0 +1,64 @@
+<header class="bg-pink-50 dark:bg-gray-800 shadow-md px-4 sm:px-10 py-4 tracking-wide sticky top-0 z-50">
+  <div class="flex items-center justify-between flex-wrap gap-4 w-full">
+    <!-- Logo -->
+    <a href="/" class="text-2xl font-bold text-pink-600 dark:text-pink-300">Sweet Bakery</a>
+
+    <!-- Desktop Menu -->
+    <nav class="sm:hidden lg:flex items-center gap-x-6 font-medium text-[15px]">
+      <a href="/" class="text-pink-600 hover:text-pink-500 dark:text-pink-300">Home</a>
+      <a href="/Products" class="hover:text-pink-600 dark:hover:text-pink-300">Products</a>
+      <a href="/About" class="hover:text-pink-600 dark:hover:text-pink-300">About</a>
+      <a href="/Contact" class="hover:text-pink-600 dark:hover:text-pink-300">Contact</a>
+    </nav>
+
+    <!-- Action Buttons (Mode/User/Cart) -->
+    <div class="sm:hidden lg:flex items-center gap-4">
+      @await Html.PartialAsync("Components/_ModeToggle")
+      @await Html.PartialAsync("Components/_UserMenu")
+      @await Html.PartialAsync("Components/_CartIcon")
+    </div>
+
+    <!-- Toggle Button -->
+    <button id="menu-toggle" class="hidden text-2xl text-pink-600 dark:text-pink-300">
+      ☰
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden lg:hidden mt-4">
+    <nav class="flex flex-col space-y-2 text-sm font-medium text-pink-800 dark:text-pink-200">
+      <a href="/" class="hover:text-pink-500">Home</a>
+      <a href="/Products" class="hover:text-pink-500">Products</a>
+      <a href="/About" class="hover:text-pink-500">About</a>
+      <a href="/Contact" class="hover:text-pink-500">Contact</a>
+    </nav>
+    <div class="flex justify-start gap-4 mt-4">
+      @await Html.PartialAsync("Components/_ModeToggle")
+      @if (User.Identity?.IsAuthenticated ?? false)
+      {
+        <div class="text-sm flex items-center gap-2">
+          <span class="text-gray-700 dark:text-gray-300">Xin chào, @User.Identity.Name!</span>
+          <form method="post" asp-page="/Account/Logout">
+            <button type="submit" class="text-pink-500 hover:underline">Đăng xuất</button>
+          </form>
+        </div>
+      }
+      else
+      {
+        <a href="/Account/Login" class="text-pink-500 hover:underline text-sm">Đăng nhập</a>
+      }
+      @await Html.PartialAsync("Components/_CartIcon")
+    </div>
+  </div>
+</header>
+
+@section Scripts {
+  <script>
+    const toggleBtn = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    toggleBtn?.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  </script>
+}

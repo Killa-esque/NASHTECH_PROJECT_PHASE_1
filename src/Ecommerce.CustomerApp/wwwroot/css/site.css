@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font 300 - Light */
+@font-face {
+  font-family: "Quicksand";
+  src: url("/fonts/Quicksand/static/Quicksand-Light.ttf") format("truetype");
+  font-weight: 300;
+}
+
+/* Font 400 - Regular */
+@font-face {
+  font-family: "Quicksand";
+  src: url("/fonts/Quicksand/static/Quicksand-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+
+/* Font 500 - Medium */
+@font-face {
+  font-family: "Quicksand";
+  src: url("/fonts/Quicksand/static/Quicksand-Medium.ttf") format("truetype");
+  font-weight: 500;
+}
+
+/* Font 600 - SemiBold */
+@font-face {
+  font-family: "Quicksand";
+  src: url("/fonts/Quicksand/static/Quicksand-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+}
+
+/* Font 700 - Bold */
+@font-face {
+  font-family: "Quicksand";
+  src: url("/fonts/Quicksand/static/Quicksand-Bold.ttf") format("truetype");
+  font-weight: 700;
+}
+
+@layer base {
+  body {
+    font-family: "Quicksand", sans-serif;
+  }
+}
+
+@layer components {
+  .swiper {
+    width: 100%;
+  }
+  .swiper-slide img {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+  }
+}
