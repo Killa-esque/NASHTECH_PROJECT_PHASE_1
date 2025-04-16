@@ -9,28 +9,31 @@ builder.Services.AddRazorPages();
 // Configure Authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = "oidc";
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 })
-.AddCookie("Cookies")
-.AddOpenIdConnect("oidc", options =>
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = "http://localhost:5001"; // AuthServer URL
-    options.ClientId = "customer-client"; // Client ID
-    options.ResponseType = "code"; // Authorization Code Flow
-    options.UsePkce = true; // PKCE for enhanced security
+    options.Authority = "https://localhost:5001"; // AuthServer URL
+    options.ClientId = "customer_client"; // Client ID
+    options.ClientSecret = "Mayhabuoi123"; // Client secret
+    options.ResponseType = "code";
+    options.UsePkce = true;
     options.SaveTokens = true;
 
     options.Scope.Clear();
     options.Scope.Add("openid");
     options.Scope.Add("profile");
-    options.Scope.Add("email");
+    options.Scope.Add("api");
+    options.Scope.Add("offline_access");
 
-    options.CallbackPath = "/account/callback"; // Redirect URI
-    options.GetClaimsFromUserInfoEndpoint = true;
-    options.TokenValidationParameters.NameClaimType = "name";
+    options.GetClaimsFromUserInfoEndpoint = false;
+    // options.TokenValidationParameters.NameClaimType = "sub";
+    // options.TokenValidationParameters.RoleClaimType = "role";
+    // options.TokenValidationParameters.ValidateIssuer = false; // Chỉ dùng cho dev môi trường
+    // options.TokenValidationParameters.ValidateAudience = false; // Chỉ dùng cho dev môi trường
 
-    options.RequireHttpsMetadata = false; // For development only
 });
 
 var app = builder.Build();

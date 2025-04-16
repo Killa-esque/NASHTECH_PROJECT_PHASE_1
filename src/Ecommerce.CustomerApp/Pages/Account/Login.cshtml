@@ -1,6 +1,16 @@
 @page
 @model LoginModel
 @{
+  Layout = "_Layout";
+}
+
+<h2>Đăng nhập</h2>
+<p>Bạn sẽ được chuyển hướng đến trang đăng nhập qua AuthServer.</p>
+<a class="btn btn-primary" asp-page-handler="Start">Đăng nhập ngay</a>
+
+@* @page
+@model LoginModel
+@{
   ViewData["Title"] = "Đăng nhập";
   Layout = "_AuthLayout"; // hoặc "_AuthLayout" nếu bạn tạo riêng layout cho auth
 }
@@ -49,4 +59,6 @@
       <a href="/Account/Register" class="text-pink-500 hover:underline font-medium">Đăng ký ngay</a>
     </p>
   </div>
-</div>
+</div> *@
+
+

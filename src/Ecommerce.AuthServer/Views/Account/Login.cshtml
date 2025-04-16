@@ -1,0 +1,14 @@
+@{
+  ViewData["Title"] = "Login";
+}
+<form method="post" asp-controller="Account" asp-action="LoginPost">
+  <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+  <label>Email</label>
+  <input name="email" required />
+
+  <label>Password</label>
+  <input name="password" type="password" required />
+
+  <button type="submit">Đăng nhập</button>
+</form>

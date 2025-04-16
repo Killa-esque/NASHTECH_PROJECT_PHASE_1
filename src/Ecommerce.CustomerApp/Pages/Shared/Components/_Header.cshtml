@@ -45,7 +45,7 @@
       }
       else
       {
-        <a href="/Account/Login" class="text-pink-500 hover:underline text-sm">Đăng nhập</a>
+        <a asp-page="/Login" asp-page-handler="Start" class="text-pink-500 hover:underline text-sm">Đăng nhập</a>
       }
       @await Html.PartialAsync("Components/_CartIcon")
     </div>
