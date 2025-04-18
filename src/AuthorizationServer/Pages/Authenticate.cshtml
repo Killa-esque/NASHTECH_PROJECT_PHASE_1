@@ -1,0 +1,31 @@
+@page
+@model AuthorizationServer.Pages.AuthenticateModel
+
+@*Please do not forget to add tag helper*@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Đăng nhập</h2>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" class="form-control" type="password" />
+    </div>
+
+    <input type="hidden" asp-for="ReturnUrl" />
+
+    <button type="submit" class="btn btn-primary">Đăng nhập</button>
+</form>
+
+

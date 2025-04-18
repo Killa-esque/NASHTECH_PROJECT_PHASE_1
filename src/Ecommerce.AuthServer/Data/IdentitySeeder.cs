@@ -8,16 +8,34 @@ public static class IdentitySeeder
     using var scope = serviceProvider.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-    var user = await userManager.FindByEmailAsync("user@example.com");
+    var user = await userManager.FindByEmailAsync("pzinh@gmail.com");
+
+    Console.WriteLine($"User: {user == null}");
     if (user == null)
     {
       user = new IdentityUser
       {
-        UserName = "user@example.com",
-        Email = "user@example.com",
+        UserName = "pzinh@gmail.com",
+        Email = "pzinh@gmail.com",
         EmailConfirmed = true
       };
-      await userManager.CreateAsync(user, "P@ssw0rd!");
+      var result = await userManager.CreateAsync(user, "@Ee12345");
+      if (result.Succeeded)
+      {
+        Console.WriteLine("User created successfully.");
+      }
+      else
+      {
+        Console.WriteLine("Failed to create user:");
+        foreach (var error in result.Errors)
+        {
+          Console.WriteLine($"- {error.Description}");
+        }
+      }
+
+      // Kiểm tra xem user đã được tạo thành công chưa
+
+
     }
   }
 }
