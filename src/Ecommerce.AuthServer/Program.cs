@@ -51,17 +51,16 @@ builder.Services.AddOpenIddict()
            .RequireProofKeyForCodeExchange()
            .AllowRefreshTokenFlow();
 
+        opt.RegisterScopes("openid", "profile", "offline_access", "api");
+
         opt.AddDevelopmentSigningCertificate()
            .AddDevelopmentEncryptionCertificate();
 
         opt.DisableAccessTokenEncryption();
 
         opt.UseAspNetCore()
-           .EnableAuthorizationEndpointPassthrough() // KHÔNG bật dòng này
-           .EnableTokenEndpointPassthrough()
-           .DisableTransportSecurityRequirement();
+           .EnableTokenEndpointPassthrough();
 
-        opt.RegisterScopes("openid", "profile", "offline_access", "api");
     });
 
 builder.Services.AddControllers();
@@ -94,7 +93,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+// app.MapControllers();
 app.MapRazorPages();
 
 app.Run();

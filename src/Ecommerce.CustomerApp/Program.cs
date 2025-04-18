@@ -15,12 +15,33 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
+
+    options.Events = new OpenIdConnectEvents
+    {
+        OnTokenResponseReceived = ctx =>
+        {
+            Console.WriteLine("🎉 Token received!");
+            Console.WriteLine($"AccessToken: {ctx.TokenEndpointResponse?.AccessToken}");
+            Console.WriteLine($"IdToken: {ctx.TokenEndpointResponse?.IdToken}");
+            Console.WriteLine($"RefreshToken: {ctx.TokenEndpointResponse?.RefreshToken}");
+            return Task.CompletedTask;
+        },
+        OnRemoteFailure = ctx =>
+        {
+            ctx.HandleResponse();
+            ctx.Response.Redirect("/error?message=" + Uri.EscapeDataString(ctx.Failure?.Message ?? "Unknown error"));
+            return Task.CompletedTask;
+        }
+    };
+
     options.Authority = "https://localhost:5001"; // AuthServer URL
     options.ClientId = "customer_client"; // Client ID
     options.ClientSecret = "Mayhabuoi123"; // Client secret
     options.ResponseType = "code";
     options.UsePkce = true;
     options.SaveTokens = true;
+
+    options.CallbackPath = "/signin-oidc";
 
     options.Scope.Clear();
     options.Scope.Add("openid");
@@ -45,6 +66,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapControllers();
 app.MapRazorPages();
 
 app.Run();
