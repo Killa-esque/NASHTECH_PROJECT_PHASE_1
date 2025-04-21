@@ -32,7 +32,10 @@ builder.Services.AddOpenIddict()
                 .SetTokenEndpointUris("connect/token")
                 .SetRevocationEndpointUris("connect/revocation");
 
-        options.RegisterScopes(Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess);
+        options.RegisterScopes(Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess, "ecommerce_api");
+
+        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30)); // ví dụ
+        options.SetRefreshTokenLifetime(TimeSpan.FromDays(14));
 
         options.AllowAuthorizationCodeFlow()
                 .AllowRefreshTokenFlow();

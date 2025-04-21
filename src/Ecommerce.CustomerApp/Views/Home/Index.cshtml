@@ -1,0 +1,48 @@
+@{
+  ViewData["Title"] = "Trang chủ";
+  var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+}
+
+<!-- Banner -->
+@await Html.PartialAsync("_Banner")
+
+<!-- Carousel -->
+@await Html.PartialAsync("_Carousel")
+
+<!-- Sản phẩm nổi bật -->
+<section class="mt-12">
+  <h2 class="text-2xl font-semibold text-pink-600 dark:text-pink-400 mb-6 text-center">
+    Món ngọt nổi bật trong tuần 🍰
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    @* Giả sử bạn lặp từ list sản phẩm — tạm mock 3 item *@
+    @for (int i = 0; i < 3; i++)
+    {
+      @await Html.PartialAsync("_ProductCard", new
+      {
+        Id = i + 1,
+        Name = $"Bánh Kem Dâu {i + 1}",
+        Price = 125000 + i * 10000,
+        ImageUrl = "/images/cake.jpg"
+        })
+        }
+  </div>
+</section>
+
+<!-- Đăng nhập / user info -->
+<section class="mt-12 text-center">
+  @if (isAuthenticated)
+  {
+    <p class="text-gray-600 dark:text-gray-300">👋 Xin chào, <strong>@User.Identity?.Name</strong></p>
+    <a href="/logout" class="inline-block mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
+      Đăng xuất
+    </a>
+  }
+  else
+  {
+    <a href="/login" class="inline-block mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+      Đăng nhập để đặt bánh 🎉
+    </a>
+  }
+</section>

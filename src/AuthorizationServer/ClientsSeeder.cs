@@ -50,10 +50,6 @@ public class ClientsSeeder
           $"{Permissions.Prefixes.Scope}offline_access"
       },
     });
-
-
-
-
   }
 
   private async Task AddApiScopeAsync()
@@ -75,29 +71,6 @@ public class ClientsSeeder
       Resources = { "ecommerce_resource_server" }
     });
   }
-
-  // public async Task AddScopes()
-  // {
-  //   await using var scope = _serviceProvider.CreateAsyncScope();
-  //   var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
-
-  //   var apiScope = await manager.FindByNameAsync("api1");
-
-  //   if (apiScope != null)
-  //   {
-  //     await manager.DeleteAsync(apiScope);
-  //   }
-
-  //   await manager.CreateAsync(new OpenIddictScopeDescriptor
-  //   {
-  //     DisplayName = "Api scope",
-  //     Name = "api1",
-  //     Resources =
-  //               {
-  //                   "resource_server_1"
-  //               }
-  //   });
-  // }
 
   private async Task AddAdminClientAsync()
   {
@@ -139,11 +112,6 @@ public class ClientsSeeder
                 Permissions.Scopes.Roles,
                 $"{Permissions.Prefixes.Scope}ecommerce_api"
             },
-
-      // Requirements =
-      //       {
-      //           Requirements.Features.ProofKeyForCodeExchange
-      //       }
     });
   }
 
@@ -185,13 +153,9 @@ public class ClientsSeeder
                 Permissions.Scopes.Email,
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
-                $"{Permissions.Prefixes.Scope}ecommerce_api"
+                $"{Permissions.Prefixes.Scope}ecommerce_api",
+                $"{Permissions.Prefixes.Scope}offline_access"
             },
-
-      // Requirements =
-      //       {
-      //           Requirements.Features.ProofKeyForCodeExchange
-      //       }
     });
   }
 }

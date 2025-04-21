@@ -18,6 +18,9 @@
     <UpToDateCheckBuilt Include="tailwind.config.js" Set="Css" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ecommerce.Shared\Ecommerce.Shared.csproj" />
+  </ItemGroup>
   <Target Name="Tailwind" BeforeTargets="Build">
     <Exec Command="yarn run css:build" />
   </Target>
