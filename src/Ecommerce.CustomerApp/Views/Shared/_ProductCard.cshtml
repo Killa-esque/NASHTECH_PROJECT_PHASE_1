@@ -1,0 +1,10 @@
+@model dynamic
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+  <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-48 object-cover rounded">
+  <h3 class="mt-2 text-lg font-semibold text-gray-800 dark:text-white">@Model.Name</h3>
+  <p class="text-pink-500 font-bold">@Model.Price.ToString("N0") ₫</p>
+  <button class="mt-2 w-full bg-pink-500 hover:bg-pink-600 text-white py-1 rounded">
+    Thêm vào giỏ
+  </button>
+</div>
