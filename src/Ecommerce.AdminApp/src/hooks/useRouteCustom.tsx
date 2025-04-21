@@ -2,9 +2,14 @@ import AppLayout from "@/layout/AppLayout";
 import { lazy } from "react";
 import { useRoutes } from "react-router-dom";
 
-const SignIn = lazy(() => import("@/pages/AuthPages/SignIn"));
+const SignIn = lazy(() => import("@/pages/AuthPage/SignIn"));
 const NotFound = lazy(() => import("@/pages/OtherPage/NotFound"));
 const UserProfiles = lazy(() => import("@/pages/UserProfiles"));
+const Category = lazy(() => import("@/pages/CategoryPage"));
+const Customer = lazy(() => import("@/pages/CustomerPage"));
+const Product = lazy(() => import("@/pages/ProductPage"));
+const OrderList = lazy(() => import("@/pages/OrderPage"));
+const OrderDetail = lazy(() => import("@/pages/OrderPage/OrderDetail"));
 const Videos = lazy(() => import("@/pages/UiElements/Videos"));
 const Images = lazy(() => import("@/pages/UiElements/Images"));
 const Alerts = lazy(() => import("@/pages/UiElements/Alerts"));
@@ -26,6 +31,11 @@ function useRouteCustom() {
       children: [
         { path: "/", element: <Home /> },
         { path: "/profile", element: <UserProfiles /> },
+        { path: "/categories", element: <Category /> },
+        { path: "/products", element: <Product /> },
+        { path: "/customers", element: <Customer /> },
+        { path: "/admin/orders", element: <OrderList /> },
+        { path: "/admin/orders/:orderId", element: <OrderDetail /> },
         { path: "/calendar", element: <Calendar /> },
         { path: "/blank", element: <Blank /> },
         { path: "/form-elements", element: <FormElements /> },

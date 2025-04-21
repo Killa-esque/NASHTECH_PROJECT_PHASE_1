@@ -1,17 +1,17 @@
+import PageMeta from "@/components/common/PageMeta";
+import DemographicCard from "@/components/ecommerce/DemographicCard";
 import EcommerceMetrics from "@/components/ecommerce/EcommerceMetrics";
 import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
 import RecentOrders from "@/components/ecommerce/RecentOrders";
-import DemographicCard from "@/components/ecommerce/DemographicCard";
-import PageMeta from "@/components/common/PageMeta";
+import StatisticsChart from "@/components/ecommerce/StatisticsChart";
 
 export default function Home() {
   return (
     <>
       <PageMeta
-        title="React.js Ecommerce Dashboard | TailAdmin - React.js Admin Dashboard Template"
-        description="This is React.js Ecommerce Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+        title="Tổng Quan Doanh Thu | Admin - Tiệm Bánh Ngọt"
+        description="Trang dashboard tổng hợp tình hình kinh doanh cho tiệm bánh ngọt."
       />
       <div className="grid grid-cols-12 gap-4 md:gap-6">
         <div className="col-span-12 space-y-6 xl:col-span-7">

@@ -3,6 +3,7 @@ interface ComponentCardProps {
   children: React.ReactNode;
   className?: string; // Additional custom classes for styling
   desc?: string; // Description text
+  action?: React.ReactNode;
 }
 
 const ComponentCard: React.FC<ComponentCardProps> = ({
@@ -10,6 +11,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   children,
   className = "",
   desc = "",
+  action = null,
 }) => {
   return (
     <div
@@ -17,9 +19,12 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
     >
       {/* Card Header */}
       <div className="px-6 py-5">
-        <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-          {title}
-        </h3>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
+            {title}
+          </h3>
+          {action && <div>{action}</div>}
+        </div>
         {desc && (
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {desc}
