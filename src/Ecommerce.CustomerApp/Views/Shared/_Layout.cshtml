@@ -1,51 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="vi" class="h-full" id="html-root">
 
 <head>
   <meta charset="utf-8" />
-  <title>@ViewData["Title"] - Sweet Bakery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <title>@ViewData["Title"] - Sweet Bakery</title>
 
-  <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+  <!-- Tailwind CSS -->
+  <link href="~/css/styles.css" rel="stylesheet" asp-append-version="true" />
   <link rel="stylesheet" href="~/css/swiper-bundle.min.css" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
+<body class="bg-amber-50 dark:bg-gray-800 text-gray-800 dark:text-yellow-100">
+  <div class="min-h-full">
+    <!-- Header -->
+    @await Html.PartialAsync("_Header")
 
-  <!-- Header -->
-  @await Html.PartialAsync("Components/_Header")
+    @await Html.PartialAsync("_Banner")
 
-  <!-- Optional: Hiển thị trạng thái người dùng -->
-  <div class="bg-yellow-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 py-2 px-4 text-right">
-    @if (User.Identity?.IsAuthenticated ?? false)
-    {
-      <span class="mr-2">👋 Xin chào, <strong>@User.Identity?.Name</strong></span>
-      <a href="/logout" class="text-red-500 hover:underline">Đăng xuất</a>
-    }
-    else
-    {
-      <a href="/login" class="text-blue-500 hover:underline">Đăng nhập</a>
-    }
+    <!-- Main content -->
+    <main class="container mx-auto px-4 sm:px-10 py-8">
+      <div>
+        @RenderBody()
+      </div>
+    </main>
   </div>
 
-  <!-- Banner -->
-  @await Html.PartialAsync("Components/_Banner")
-
-  <!-- Carousel -->
-  @await Html.PartialAsync("Components/_Carousel")
-
-  <!-- Main content -->
-  <main class="flex-1 container mx-auto px-4 py-8">
-    @RenderBody()
-  </main>
-
   <!-- Footer -->
-  @await Html.PartialAsync("Components/_Footer")
+  @await Html.PartialAsync("_Footer")
 
-  @RenderSection("Scripts", required: false)
-
+  <!-- JS -->
+  <script src="~/js/theme-toggle.js"></script>
   <script src="~/js/swiper-bundle.min.js"></script>
+  @RenderSection("Scripts", required: false)
 
   <script>
     var swiper = new Swiper(".mySwiper", {
@@ -57,16 +47,7 @@
         clickable: true,
       },
     });
-
-    // Dark mode toggle
-    if (localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
   </script>
-
 </body>
 
 </html>

@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "daisyui": "4.12.24",
     "postcss": "^8.5.3",
     "tailwindcss": "3"
   },

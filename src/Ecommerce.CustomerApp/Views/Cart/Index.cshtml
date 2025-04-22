@@ -1,0 +1,102 @@
+<section class="bg-white dark:bg-gray-900 py-20 px-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-10">🛒 Giỏ hàng của bạn</h1>
+
+    <div class="overflow-x-auto bg-amber-50 dark:bg-gray-800 rounded-xl p-6 shadow">
+      <table class="table w-full">
+        <thead>
+          <tr class="text-yellow-900 dark:text-yellow-300">
+            <th></th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Tạm tính</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="text-yellow-800 dark:text-yellow-100">
+          <tr>
+            <td><img src="/img/cake1.jpg" class="w-14 h-14 rounded object-cover" /></td>
+            <td>Bánh Tart Dâu</td>
+            <td>
+              <div class="flex items-center gap-2">
+                <button class="btn btn-sm btn-outline">-</button>
+                <input type="number" value="2" min="1" class="input input-sm w-16 text-center" />
+                <button class="btn btn-sm btn-outline">+</button>
+              </div>
+            </td>
+            <td>145.000 ₫</td>
+            <td>290.000 ₫</td>
+            <td>
+              <button class="btn btn-xs btn-error text-white" onclick="document.getElementById('delete-modal').showModal()">❌</button>
+            </td>
+          </tr>
+          <tr>
+            <td><img src="/img/cake2.jpg" class="w-14 h-14 rounded object-cover" /></td>
+            <td>Bánh Mousse Cam</td>
+            <td>
+              <div class="flex items-center gap-2">
+                <button class="btn btn-sm btn-outline">-</button>
+                <input type="number" value="1" min="1" class="input input-sm w-16 text-center" />
+                <button class="btn btn-sm btn-outline">+</button>
+              </div>
+            </td>
+            <td>110.000 ₫</td>
+            <td>110.000 ₫</td>
+            <td>
+              <button class="btn btn-xs btn-error text-white" onclick="document.getElementById('delete-modal').showModal()">❌</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Ghi chú + mã giảm giá -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+        <div>
+          <label class="label">
+            <span class="label-text text-yellow-900 dark:text-yellow-100">📝 Ghi chú đơn hàng</span>
+          </label>
+          <textarea class="textarea textarea-bordered w-full bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" rows="3">Vui lòng ghi "Chúc mừng sinh nhật An" trên bánh</textarea>
+        </div>
+
+        <div>
+          <label class="label">
+            <span class="label-text text-yellow-900 dark:text-yellow-100">🎁 Mã giảm giá</span>
+          </label>
+          <div class="flex gap-2">
+            <input type="text" placeholder="Nhập mã..." class="input input-bordered flex-1 bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            <button class="btn bg-yellow-800 text-white">Áp dụng</button>
+          </div>
+          <p class="text-sm text-green-600 mt-1">✓ Mã giảm giá 10% đã được áp dụng</p>
+        </div>
+      </div>
+
+      <div class="divider my-8"></div>
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-yellow-900 dark:text-yellow-100 space-y-1 text-lg">
+          <p class="font-medium">Tạm tính: 400.000 ₫</p>
+          <p class="font-medium">Giảm giá: -40.000 ₫</p>
+          <p class="font-semibold">Tổng cộng: <span class="text-xl">360.000 ₫</span></p>
+        </div>
+        <div class="flex gap-3">
+          <button class="btn btn-outline">🔄 Cập nhật giỏ hàng</button>
+          <a href="/Order/Create" class="btn bg-yellow-800 text-white">✅ Tiến hành đặt bánh</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal xác nhận xoá -->
+  <dialog id="delete-modal" class="modal">
+    <div class="modal-box bg-white dark:bg-gray-800 text-yellow-900 dark:text-yellow-100">
+      <h3 class="font-bold text-lg">🗑 Xác nhận xoá</h3>
+      <p class="py-2">Bạn có chắc muốn xoá bánh “Tart Dâu” khỏi giỏ hàng không?</p>
+      <div class="modal-action">
+        <form method="dialog" class="flex gap-2">
+          <button class="btn">Huỷ</button>
+          <button class="btn btn-error text-white">Xoá</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+</section>

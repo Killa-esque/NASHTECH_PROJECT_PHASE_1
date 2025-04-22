@@ -1,0 +1,54 @@
+@{
+  ViewData["Title"] = "Sản phẩm";
+}
+
+<section class="bg-white dark:bg-gray-800 py-20">
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Tiêu đề -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold tracking-tight text-yellow-900 dark:text-yellow-300 mb-4">
+        Tất cả bánh ngọt 🍪
+      </h1>
+      <p class="text-lg text-yellow-800 dark:text-yellow-300 max-w-xl mx-auto">
+        Khám phá bộ sưu tập bánh ngọt thủ công đặc biệt được yêu thích nhất tại tiệm.
+      </p>
+    </div>
+
+    <!-- Bộ lọc (nếu có) -->
+    <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
+      <div class="text-sm text-yellow-900 dark:text-yellow-200">
+        @* ví dụ: 36 sản phẩm *@
+        Hiển thị 1–12 trong 36 sản phẩm
+      </div>
+      <div class="flex gap-3">
+        <select class="select select-sm bg-amber-100 dark:bg-gray-700 text-yellow-900 dark:text-yellow-200">
+          <option>Mới nhất</option>
+          <option>Giá tăng dần</option>
+          <option>Giá giảm dần</option>
+          <option>Bán chạy</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Danh sách sản phẩm -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+      @for (int i = 0; i < 8; i++)
+      {
+        @await Html.PartialAsync("_ProductCard", new {
+        Id = i + 1,
+            Name = $"Bánh Ngọt Số {i + 1}",
+            Price = 135000 + i * 10000,
+            ImageUrl = "/img/mini-cake.jpg"
+            })
+            }
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-16">
+      <a href="/cart"
+        class="inline-block bg-yellow-900 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg text-sm font-medium transition">
+        Đặt hàng ngay 🛒
+      </a>
+    </div>
+  </div>
+</section>

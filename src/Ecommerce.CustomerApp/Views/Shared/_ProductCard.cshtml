@@ -1,10 +1,19 @@
 @model dynamic
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-  <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-48 object-cover rounded">
-  <h3 class="mt-2 text-lg font-semibold text-gray-800 dark:text-white">@Model.Name</h3>
-  <p class="text-pink-500 font-bold">@Model.Price.ToString("N0") ₫</p>
-  <button class="mt-2 w-full bg-pink-500 hover:bg-pink-600 text-white py-1 rounded">
-    Thêm vào giỏ
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col">
+  <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-48 object-cover rounded-md mb-4">
+
+  <h3 class="text-lg font-extrabold text-yellow-900 dark:text-yellow-300 mb-1">
+    @Model.Name
+  </h3>
+
+  <p class="text-yellow-800 dark:text-yellow-400 text-base">
+    @Model.Price.ToString("N0") ₫
+  </p>
+
+  <button class="mt-auto w-full bg-yellow-800 hover:bg-yellow-700 
+                  dark:bg-yellow-700 dark:hover:bg-yellow-600
+                  text-white py-2 rounded-md text-sm font-medium tracking-wide transition">
+    Thêm vào giỏ 🛒
   </button>
 </div>

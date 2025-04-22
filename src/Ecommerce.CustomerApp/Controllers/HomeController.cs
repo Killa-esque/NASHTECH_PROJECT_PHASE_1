@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-
-namespace Ecommerce.CustomerApp.Controllers;
 
 public class HomeController : Controller
 {
-  public IActionResult Index()
+  public async Task<IActionResult> Index()
   {
+    var accessToken = await HttpContext.GetTokenAsync("access_token");
+    var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
+    var idToken = await HttpContext.GetTokenAsync("id_token");
+    var expiresAt = await HttpContext.GetTokenAsync("expires_at");
     return View();
   }
 }

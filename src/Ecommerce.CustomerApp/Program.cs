@@ -19,8 +19,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddHttpContextAccessor();
 
 // Add Razor Pages
-builder.Services.AddControllers();
-builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
+// builder.Services.AddRazorPages();
 
 // ✅ Configure Authentication
 builder.Services.AddAuthentication(options =>
@@ -48,7 +48,7 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("email");
     options.Scope.Add("roles");
     options.Scope.Add("ecommerce_api");
-    options.Scope.Add("offline_access");
+    options.Scope.Add("offline_access"); // ✅ đây là tên thật của scope!
 
     options.GetClaimsFromUserInfoEndpoint = true;
 
@@ -56,8 +56,8 @@ builder.Services.AddAuthentication(options =>
     {
         NameClaimType = "name",
         RoleClaimType = "role",
-        ValidateIssuer = true, // bạn có thể set false khi dev local
-        ValidateAudience = false // không cần audience nếu không đặt audience trong token
+        ValidateIssuer = true,
+        ValidateAudience = false
     };
 
     options.Events = new OpenIdConnectEvents
@@ -79,6 +79,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
@@ -88,7 +89,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
-app.MapRazorPages();
+// app.MapControllers();
+// app.MapRazorPages();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

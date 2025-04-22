@@ -1,0 +1,108 @@
+<section class="bg-white dark:bg-gray-900 py-20 px-6">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-10 text-center">
+      👤 Hồ sơ người dùng
+    </h1>
+
+    <!-- Avatar riêng biệt -->
+    <div class="flex justify-center mb-10">
+      <div class="flex flex-col items-center gap-4">
+        <img src="/img/vinh_avatar.jpg" alt="Avatar"
+          class="w-32 h-32 rounded-full object-cover border-4 border-yellow-700 dark:border-yellow-300" />
+        <input type="file" class="file-input file-input-bordered w-full max-w-xs" />
+      </div>
+    </div>
+
+    <div class="card bg-amber-50 dark:bg-gray-800 shadow-xl p-6">
+      <form enctype="multipart/form-data">
+        <!-- User Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-yellow-900 dark:text-yellow-100">Họ và tên</span>
+              </label>
+              <input type="text" value="Nguyễn Văn A"
+                class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-yellow-900 dark:text-yellow-100">Email</span>
+              </label>
+              <input type="email" value="you@example.com"
+                class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-yellow-900 dark:text-yellow-100">Số điện thoại</span>
+              </label>
+              <input type="text" value="0123 456 789"
+                class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            </div>
+          </div>
+
+          <!-- Địa chỉ, ngày sinh, giới tính -->
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-yellow-900 dark:text-yellow-100">Địa chỉ mặc định</span>
+              </label>
+              <textarea
+                class="textarea textarea-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
+                rows="3">123 Đường ABC, Quận 1, TP.HCM</textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text text-yellow-900 dark:text-yellow-100">Ngày sinh</span>
+                </label>
+                <input type="date"
+                  class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text text-yellow-900 dark:text-yellow-100">Giới tính</span>
+                </label>
+                <select class="select select-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100">
+                  <option>Nam</option>
+                  <option>Nữ</option>
+                  <option>Khác</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dị ứng -->
+        <div class="form-control mt-10">
+          <label class="label">
+            <span class="label-text text-yellow-900 dark:text-yellow-100">Ghi chú khẩu vị / dị ứng</span>
+          </label>
+          <textarea class="textarea textarea-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
+            rows="2">Không dùng dâu tây, dị ứng hải sản</textarea>
+        </div>
+
+        <!-- Đổi mật khẩu -->
+        <div class="mt-12 border-t border-amber-200 dark:border-gray-700 pt-6">
+          <h2 class="text-xl font-semibold text-yellow-900 dark:text-yellow-300 mb-4">🔒 Đổi mật khẩu</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <input type="password" placeholder="Mật khẩu hiện tại"
+              class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            <input type="password" placeholder="Mật khẩu mới"
+              class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            <input type="password" placeholder="Xác nhận mật khẩu mới"
+              class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="text-end mt-10">
+          <button type="submit" class="btn bg-yellow-800 hover:bg-yellow-700 text-white">
+            💾 Lưu thay đổi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

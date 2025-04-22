@@ -1,0 +1,111 @@
+<section class="bg-white dark:bg-gray-800 py-20">
+  <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <!-- Hình ảnh bánh -->
+    <div class="space-y-4">
+      <div class="rounded-xl overflow-hidden shadow-lg">
+        <img src="/img/mini-cake.jpg" alt="Bánh Tart Dâu" class="w-full h-[400px] object-cover" />
+      </div>
+      <div class="flex gap-2">
+        <img src="/img/mini-cake.jpg" class="w-20 h-20 object-cover rounded-lg border cursor-pointer" />
+        <img src="/img/mini-cake.jpg" class="w-20 h-20 object-cover rounded-lg border cursor-pointer" />
+        <img src="/img/mini-cake.jpg" class="w-20 h-20 object-cover rounded-lg border cursor-pointer" />
+      </div>
+    </div>
+
+    <!-- Thông tin bánh -->
+    <div class="space-y-6">
+      <!-- Breadcrumb -->
+      <div class="text-sm breadcrumbs">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/Product">Sản phẩm</a></li>
+          <li>Bánh Tart Dâu</li>
+        </ul>
+      </div>
+
+      <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300">
+        Bánh Tart Dâu 🍓
+      </h1>
+
+      <div class="rating rating-sm">
+        <input type="radio" name="rating-5" class="mask mask-star-2 bg-yellow-500" checked />
+        <input type="radio" name="rating-5" class="mask mask-star-2 bg-yellow-500" />
+        <input type="radio" name="rating-5" class="mask mask-star-2 bg-yellow-500" />
+        <input type="radio" name="rating-5" class="mask mask-star-2 bg-yellow-500" />
+        <input type="radio" name="rating-5" class="mask mask-star-2 bg-yellow-500" />
+        <span class="ml-2 text-sm text-yellow-800 dark:text-yellow-300">(26 đánh giá)</span>
+      </div>
+
+      <p class="text-lg text-yellow-800 dark:text-yellow-300">
+        Bánh tart dâu với lớp kem trứng mịn, nền bánh giòn và topping dâu tươi mát lạnh.
+      </p>
+
+      <div class="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+        145.000 ₫
+      </div>
+
+      <div class="form-control max-w-xs">
+        <label class="label">
+          <span class="label-text text-yellow-800 dark:text-yellow-300">Số lượng</span>
+        </label>
+        <input type="number" min="1" value="1"
+          class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+      </div>
+
+      <div class="flex gap-4 max-w-xs">
+        <button
+          class="btn flex-1 bg-yellow-800 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-white">
+          🛒 Thêm vào giỏ
+        </button>
+        <button class="btn flex-1 bg-red-600 hover:bg-red-500 text-white">
+          🧾 Đặt bánh ngay
+        </button>
+      </div>
+
+      <!-- Info bổ sung -->
+      <div class="collapse collapse-arrow bg-amber-50 dark:bg-gray-700 mt-6">
+        <input type="checkbox" />
+        <div class="collapse-title font-medium text-yellow-800 dark:text-yellow-100">
+          Thông tin sản phẩm
+        </div>
+        <div class="collapse-content text-sm text-yellow-900 dark:text-yellow-200">
+          <ul class="list-disc list-inside space-y-1">
+            <li>Trọng lượng: 500g</li>
+            <li>Thành phần: Bột mì, trứng gà, sữa, dâu tây, kem tươi</li>
+            <li>Hạn sử dụng: 3 ngày kể từ ngày sản xuất</li>
+            <li>Bảo quản: Tủ mát (2–6°C)</li>
+            <li>Dị ứng: Chứa gluten và sữa</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sản phẩm liên quan -->
+  <div class="max-w-6xl mx-auto px-6 mt-20">
+    <h2 class="text-2xl font-semibold text-yellow-900 dark:text-yellow-300 mb-6">
+      Có thể bạn sẽ thích 🍰
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+      @* Giả lập 4 sản phẩm *@
+      @for (int i = 1; i <= 4; i++)
+      {
+        <div class="card bg-base-100 dark:bg-gray-800 shadow-md rounded-xl">
+          <figure class="px-4 pt-4">
+            <img src="/img/mini-cake.jpg" alt="Cake" class="rounded-xl h-40 object-cover w-full" />
+          </figure>
+          <div class="card-body items-center text-center">
+            <h3 class="card-title text-yellow-900 dark:text-yellow-300 text-base font-bold">Bánh Ngọt @i</h3>
+            <p class="text-yellow-800 dark:text-yellow-400 text-sm">135.000 ₫</p>
+            <div class="card-actions">
+              <a href="/Product/Details/@i"
+                class="btn btn-sm bg-yellow-800 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-white">
+                Xem chi tiết
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

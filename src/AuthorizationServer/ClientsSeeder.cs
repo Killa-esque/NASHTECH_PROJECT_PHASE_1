@@ -70,6 +70,20 @@ public class ClientsSeeder
       DisplayName = "Ecommerce Resource API",
       Resources = { "ecommerce_resource_server" }
     });
+
+    // ✅ Thêm scope offline_access
+    var existingOfflineScope = await scopeManager.FindByNameAsync(Scopes.OfflineAccess);
+    if (existingOfflineScope != null)
+    {
+      await scopeManager.DeleteAsync(existingOfflineScope);
+    }
+
+    await scopeManager.CreateAsync(new OpenIddictScopeDescriptor
+    {
+      Name = Scopes.OfflineAccess,
+      DisplayName = "Offline access",
+      Resources = { "ecommerce_resource_server" } // hoặc để trống nếu không cần gắn với resource cụ thể
+    });
   }
 
   private async Task AddAdminClientAsync()
@@ -148,6 +162,7 @@ public class ClientsSeeder
                 Permissions.Endpoints.Token,
                 Permissions.Endpoints.EndSession,
                 Permissions.GrantTypes.AuthorizationCode,
+                Permissions.GrantTypes.RefreshToken,
                 Permissions.ResponseTypes.Code,
 
                 Permissions.Scopes.Email,
