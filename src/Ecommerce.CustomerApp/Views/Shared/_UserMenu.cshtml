@@ -1,0 +1,28 @@
+@{
+  var userName = User.Identity?.Name ?? "U";
+  var firstLetter = userName.Substring(0, 1).ToUpper();
+}
+
+<div class="dropdown dropdown-end">
+  <div tabindex="0" role="button" class="btn btn-circle btn-sm bg-yellow-700 text-white hover:bg-yellow-600">
+    @firstLetter
+  </div>
+
+  <ul tabindex="0"
+    class="mt-2 dropdown-content z-[100] menu p-2 shadow-lg bg-base-100 dark:bg-gray-800 rounded-box w-48">
+    <li>
+      <a href="/Account/Profile" class="text-yellow-900 dark:text-yellow-300 hover:bg-amber-100 dark:hover:bg-gray-700">
+        👤 Hồ sơ
+      </a>
+    </li>
+    <li>
+      <a href="/Logout" class="text-red-600 hover:bg-amber-100 dark:hover:bg-gray-700">
+        🚪 Đăng xuất
+      </a>
+    </li>
+    <li class="mt-2 border-t border-gray-200 dark:border-gray-700"></li>
+    <li class="px-2 pt-2">
+      @await Html.PartialAsync("_ModeToggle")
+    </li>
+  </ul>
+</div>

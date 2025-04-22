@@ -5,8 +5,9 @@ module.exports = {
     "./Views/**/*.cshtml",
     "./Views/Shared/**/*.cshtml",
   ],
+  darkMode: "class",
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("daisyui")],
 };

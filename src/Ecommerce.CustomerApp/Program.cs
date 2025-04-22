@@ -1,12 +1,28 @@
+using Ecommerce.CustomerApp.Services;
+using Ecommerce.CustomerApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Razor Pages
-builder.Services.AddRazorPages();
+// Configure HttpClient
+builder.Services.AddHttpClient("MyHttpClient", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.DefaultRequestHeaders.Add("User-Agent", "Ecommerce.CustomerApp");
+});
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
-// Configure Authentication
+builder.Services.AddHttpContextAccessor();
+
+// Add Razor Pages
+builder.Services.AddControllersWithViews();
+// builder.Services.AddRazorPages();
+
+// ✅ Configure Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -15,6 +31,34 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
+    options.Authority = "https://localhost:5000";
+
+    options.ClientId = "customer_client";
+    options.ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654";
+    options.ResponseType = "code";
+    options.UsePkce = false;
+
+    options.SaveTokens = true;
+    options.CallbackPath = "/signin-oidc";
+    options.SignedOutCallbackPath = "/signout-callback-oidc";
+
+    options.Scope.Clear();
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+    options.Scope.Add("roles");
+    options.Scope.Add("ecommerce_api");
+    options.Scope.Add("offline_access"); // ✅ đây là tên thật của scope!
+
+    options.GetClaimsFromUserInfoEndpoint = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        NameClaimType = "name",
+        RoleClaimType = "role",
+        ValidateIssuer = true,
+        ValidateAudience = false
+    };
 
     options.Events = new OpenIdConnectEvents
     {
@@ -33,29 +77,8 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
-
-    options.Authority = "https://localhost:5001"; // AuthServer URL
-    options.ClientId = "customer_client"; // Client ID
-    options.ClientSecret = "Mayhabuoi123"; // Client secret
-    options.ResponseType = "code";
-    options.UsePkce = true;
-    options.SaveTokens = true;
-
-    options.CallbackPath = "/signin-oidc";
-
-    options.Scope.Clear();
-    options.Scope.Add("openid");
-    options.Scope.Add("profile");
-    options.Scope.Add("api");
-    options.Scope.Add("offline_access");
-
-    options.GetClaimsFromUserInfoEndpoint = false;
-    // options.TokenValidationParameters.NameClaimType = "sub";
-    // options.TokenValidationParameters.RoleClaimType = "role";
-    // options.TokenValidationParameters.ValidateIssuer = false; // Chỉ dùng cho dev môi trường
-    // options.TokenValidationParameters.ValidateAudience = false; // Chỉ dùng cho dev môi trường
-
 });
+
 
 var app = builder.Build();
 
@@ -66,7 +89,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
-app.MapRazorPages();
+// app.MapControllers();
+// app.MapRazorPages();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

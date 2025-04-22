@@ -1,0 +1,6 @@
+@* Search bar không cần nút, chỉ nhấn Enter để search *@
+<form asp-controller="Product" asp-action="Index" method="get" class="w-full max-w-xs">
+  <input name="search" type="text" placeholder="Tìm bánh theo tên..."
+    class="input input-sm input-bordered w-full bg-amber-50 dark:bg-gray-800 text-yellow-900 dark:text-yellow-100 placeholder:text-yellow-800 dark:placeholder:text-yellow-400"
+    autocomplete="off" />
+</form>

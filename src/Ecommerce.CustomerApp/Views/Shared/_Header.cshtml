@@ -1,0 +1,83 @@
+<header class="bg-amber-50 dark:bg-gray-800 shadow-md px-4 sm:px-10 py-4 tracking-wide sticky top-0 z-50">
+  <div class="flex items-center justify-between w-full gap-6 flex-wrap">
+    <!-- Logo -->
+    <a href="/" class="text-2xl font-bold text-yellow-800 dark:text-yellow-300">
+      Sweet Bakery
+    </a>
+
+    <!-- Desktop Menu -->
+    <nav class="hidden lg:flex items-center gap-x-6 font-medium text-[15px]">
+      <a href="/"
+        class="text-yellow-800 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 transition">Home</a>
+      <a href="/Product"
+        class="text-yellow-800 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 transition">Products</a>
+      <a href="/About"
+        class="text-yellow-800 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 transition">About</a>
+      <a href="/Contact"
+        class="text-yellow-800 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-100 transition">Contact</a>
+    </nav>
+
+    <div class="hidden lg:flex items-center gap-4">
+      @await Html.PartialAsync("_CartIcon")
+      @await Html.PartialAsync("_SearchBar") <!-- ✅ Giờ sẽ nằm gọn 1 dòng -->
+
+      @if (User.Identity?.IsAuthenticated ?? false)
+      {
+        @await Html.PartialAsync("_UserMenu")
+      }
+      else
+      {
+        <a href="/login"
+          class="text-sm text-yellow-900 dark:text-yellow-300 hover:text-yellow-700 dark:hover:text-yellow-100 transition">
+          Đăng nhập
+        </a>
+      }
+    </div>
+
+    <!-- Toggle Button (Mobile) -->
+    <button id="menu-toggle" class="lg:hidden text-2xl text-yellow-800 dark:text-yellow-300">
+      ☰
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden lg:hidden mt-4 space-y-4">
+    <nav class="flex flex-col space-y-2 text-sm font-medium text-yellow-800 dark:text-yellow-300">
+      <a href="/" class="hover:text-yellow-700 dark:hover:text-yellow-100">Home</a>
+      <a href="/Product" class="hover:text-yellow-700 dark:hover:text-yellow-100">Products</a>
+      <a href="/About" class="hover:text-yellow-700 dark:hover:text-yellow-100">About</a>
+      <a href="/Contact" class="hover:text-yellow-700 dark:hover:text-yellow-100">Contact</a>
+    </nav>
+    <div class="flex flex-wrap items-center gap-4">
+      @await Html.PartialAsync("_CartIcon")
+      @await Html.PartialAsync("_SearchBar")
+      @if (User.Identity?.IsAuthenticated ?? false)
+      {
+        <a href="/Account/Profile"
+          class="text-yellow-900 dark:text-yellow-300 hover:text-yellow-700 dark:hover:text-yellow-100 text-sm">
+          Hồ sơ
+        </a>
+        <a href="/Logout" class="text-yellow-900 dark:text-yellow-300 hover:text-red-600 dark:hover:text-red-400 text-sm">
+          Đăng xuất
+        </a>
+      }
+      else
+      {
+        <a href="/login"
+          class="text-yellow-900 dark:text-yellow-300 hover:text-yellow-700 dark:hover:text-yellow-100 text-sm">
+          Đăng nhập
+        </a>
+      }
+    </div>
+  </div>
+</header>
+
+@section Scripts {
+  <script>
+    const toggleBtn = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+    toggleBtn?.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  </script>
+}

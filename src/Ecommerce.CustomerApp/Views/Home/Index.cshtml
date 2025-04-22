@@ -1,0 +1,64 @@
+@{
+  ViewData["Title"] = "Trang chủ";
+  var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+}
+
+<!-- Carousel -->
+@await Html.PartialAsync("_Carousel")
+
+<!-- Hero Section -->
+<section class="bg-amber-50 dark:bg-gray-800 py-20">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h1 class="text-4xl font-extrabold text-yellow-900 dark:text-yellow-300 mb-4">
+      Vị ngọt lan tỏa từ những chiếc bánh thủ công 🍞
+    </h1>
+    <p class="text-lg text-amber-800 dark:text-gray-300 mb-6">
+      Chào mừng bạn đến với tiệm bánh của chúng tôi — nơi hương vị và cảm xúc hội tụ!
+    </p>
+    <a href="/products"
+      class="inline-block bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition">
+      Khám phá menu
+    </a>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="my-12 border-t border-amber-400 dark:border-gray-700 w-1/2 mx-auto"></div>
+
+<!-- Sản phẩm nổi bật -->
+<section class="bg-white dark:bg-gray-800 py-20">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- Tiêu đề -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold tracking-tight text-yellow-900 dark:text-yellow-300 mb-4">
+        Bánh nổi bật trong tuần 🥐
+      </h2>
+      <p class="text-lg text-yellow-800 dark:text-yellow-300 max-w-xl mx-auto">
+        Từng chiếc bánh là một câu chuyện nhỏ ngọt ngào, được chọn lọc bởi khách hàng thân thiết!
+      </p>
+    </div>
+
+    <!-- Lưới sản phẩm -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+      @for (int i = 0; i < 4; i++)
+      {
+        @await Html.PartialAsync("_ProductCard", new {
+        Id = i + 1,
+            Name = $"Bánh Tart Táo {i + 1}",
+            Price = 135000 + i * 10000,
+            ImageUrl = "/img/mini-cake.jpg"
+            })
+            }
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-14">
+      <a href="/products"
+        class="inline-block bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg text-sm font-medium transition">
+        Xem thêm bánh ngọt 🍰
+      </a>
+    </div>
+
+  </div>
+</section>

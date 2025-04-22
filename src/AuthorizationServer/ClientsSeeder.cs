@@ -50,10 +50,6 @@ public class ClientsSeeder
           $"{Permissions.Prefixes.Scope}offline_access"
       },
     });
-
-
-
-
   }
 
   private async Task AddApiScopeAsync()
@@ -74,30 +70,21 @@ public class ClientsSeeder
       DisplayName = "Ecommerce Resource API",
       Resources = { "ecommerce_resource_server" }
     });
+
+    // ✅ Thêm scope offline_access
+    var existingOfflineScope = await scopeManager.FindByNameAsync(Scopes.OfflineAccess);
+    if (existingOfflineScope != null)
+    {
+      await scopeManager.DeleteAsync(existingOfflineScope);
+    }
+
+    await scopeManager.CreateAsync(new OpenIddictScopeDescriptor
+    {
+      Name = Scopes.OfflineAccess,
+      DisplayName = "Offline access",
+      Resources = { "ecommerce_resource_server" } // hoặc để trống nếu không cần gắn với resource cụ thể
+    });
   }
-
-  // public async Task AddScopes()
-  // {
-  //   await using var scope = _serviceProvider.CreateAsyncScope();
-  //   var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
-
-  //   var apiScope = await manager.FindByNameAsync("api1");
-
-  //   if (apiScope != null)
-  //   {
-  //     await manager.DeleteAsync(apiScope);
-  //   }
-
-  //   await manager.CreateAsync(new OpenIddictScopeDescriptor
-  //   {
-  //     DisplayName = "Api scope",
-  //     Name = "api1",
-  //     Resources =
-  //               {
-  //                   "resource_server_1"
-  //               }
-  //   });
-  // }
 
   private async Task AddAdminClientAsync()
   {
@@ -139,11 +126,6 @@ public class ClientsSeeder
                 Permissions.Scopes.Roles,
                 $"{Permissions.Prefixes.Scope}ecommerce_api"
             },
-
-      // Requirements =
-      //       {
-      //           Requirements.Features.ProofKeyForCodeExchange
-      //       }
     });
   }
 
@@ -180,18 +162,15 @@ public class ClientsSeeder
                 Permissions.Endpoints.Token,
                 Permissions.Endpoints.EndSession,
                 Permissions.GrantTypes.AuthorizationCode,
+                Permissions.GrantTypes.RefreshToken,
                 Permissions.ResponseTypes.Code,
 
                 Permissions.Scopes.Email,
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
-                $"{Permissions.Prefixes.Scope}ecommerce_api"
+                $"{Permissions.Prefixes.Scope}ecommerce_api",
+                $"{Permissions.Prefixes.Scope}offline_access"
             },
-
-      // Requirements =
-      //       {
-      //           Requirements.Features.ProofKeyForCodeExchange
-      //       }
     });
   }
 }
