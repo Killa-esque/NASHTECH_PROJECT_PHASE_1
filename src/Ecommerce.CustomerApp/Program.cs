@@ -3,16 +3,22 @@ using Ecommerce.CustomerApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Ecommerce.CustomerApp.Services.ApiClients.Interfaces;
+using Ecommerce.CustomerApp.Services.ApiClients;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure HttpClient
-builder.Services.AddHttpClient("MyHttpClient", client =>
+builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
     client.DefaultRequestHeaders.Add("User-Agent", "Ecommerce.CustomerApp");
 });
+
+builder.Services.AddScoped<ICategoryApiClient, CategoryApiClient>();
+builder.Services.AddScoped<IProductApiClient, ProductApiClient>();
+
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
