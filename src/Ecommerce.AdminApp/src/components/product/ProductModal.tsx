@@ -1,3 +1,8 @@
+import {
+  CreateProductDto,
+  ProductResponseDto,
+  UpdateProductDto,
+} from "@/api/product/productTypes";
 import FileInput from "@/components/form/input/FileInput";
 import Input from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
@@ -5,15 +10,15 @@ import Label from "@/components/form/Label";
 import Select from "@/components/form/Select";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
-import { IProduct } from "@/types/product";
 import { useEffect, useState } from "react";
 
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: Omit<IProduct, "id" | "createdAt" | "updatedAt">) => void;
   isEdit?: boolean;
-  initialData?: Partial<IProduct>;
+  initialData?: Partial<ProductResponseDto>;
+  onCreate?: (data: CreateProductDto) => void; // For create mode
+  onEdit?: (data: UpdateProductDto) => void; // For edit mode
 }
 
 const categoryOptions = [
@@ -25,33 +30,59 @@ const categoryOptions = [
 export default function ProductModal({
   isOpen,
   onClose,
-  onSubmit,
   isEdit = false,
   initialData,
+  onCreate,
+  onEdit,
 }: ProductModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
   const [categoryId, setCategoryId] = useState("1");
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     if (isEdit && initialData) {
       setName(initialData.name || "");
       setDescription(initialData.description || "");
       setPrice(initialData.price || 0);
-      setCategoryId(initialData.categoryId?.toString() || "1");
+      setCategoryId(initialData.categoryId || "1");
+      setImageUrl(initialData.imageUrl || "");
+    } else {
+      // Reset form when creating a new product
+      setName("");
+      setDescription("");
+      setPrice(0);
+      setCategoryId("1");
+      setImageUrl("");
     }
   }, [isEdit, initialData]);
 
   const handleSubmit = () => {
-    onSubmit({
+    const data: CreateProductDto | UpdateProductDto = {
       name,
       description,
       price,
-      categoryId: parseInt(categoryId, 10),
-      images: [],
-    });
+      categoryId,
+      imageUrl,
+      stock: isEdit ? initialData?.stock : 0,
+    };
+
+    if (isEdit && onEdit) {
+      onEdit(data as UpdateProductDto);
+    } else if (!isEdit && onCreate) {
+      onCreate(data as CreateProductDto);
+    }
+
     onClose();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const fileUrl = URL.createObjectURL(files[0]);
+      setImageUrl(fileUrl);
+    }
   };
 
   return (
@@ -109,7 +140,7 @@ export default function ProductModal({
 
         <div>
           <Label htmlFor="image">Hình ảnh</Label>
-          <FileInput onChange={(e) => console.log(e.target.files)} />
+          <FileInput onChange={handleFileChange} />
         </div>
       </div>
 

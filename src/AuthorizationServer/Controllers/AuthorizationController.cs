@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
 using System.Security.Claims;
 using System.Web;
+using AuthorizationServer.Services;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

@@ -1,43 +1,41 @@
-namespace Ecommerce.API.Mappings;
 
 using AutoMapper;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Application.DTOs;
-
-// using Ecommerce.Domain.Entities;
-// using Ecommerce.Shared.DTOs;
+using Ecommerce.Shared.ViewModels;
+using Ecommerce.Shared.Common;
+using Ecommerce.Infrastructure.Entities;
+using Ecommerce.Application.Common;
 
 public class MappingProfile : Profile
 {
   public MappingProfile()
   {
-    // Request → DTO
-    // CreateMap<CreateProductRequest, ProductDTO>();
-
     // DTO ⇄ ViewModel
-    // CreateMap<ProductDTO, ProductViewModel>();
-    // CreateMap<ProductViewModel, ProductDTO>();
+    CreateMap<CategoryDto, CategoryViewModel>().ReverseMap();
+    CreateMap<ProductDto, ProductViewModel>().ReverseMap();
+    CreateMap<PaymentTransactionDto, PaymentTransactionViewModel>().ReverseMap();
+    CreateMap<OrderDto, OrderViewModel>().ReverseMap();
+    CreateMap<OrderItemDto, OrderItemViewModel>().ReverseMap();
+    CreateMap<CartItemDto, CartItemViewModel>().ReverseMap();
+    CreateMap<RatingDto, RatingViewModel>().ReverseMap();
+    CreateMap<DiscountCodeDto, DiscountCodeViewModel>().ReverseMap();
+    // CreateMap<CustomerDto, CustomerViewModel>().ReverseMap();
 
     // DTO ⇄ Entity
-    // Product
-    // CreateMap<Product, ProductDTO>()
-    //     .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
-    // CreateMap<ProductDTO, Product>();
+    CreateMap<CategoryDto, Category>().ReverseMap();
+    CreateMap<ProductDto, Product>().ReverseMap();
+    CreateMap<PaymentTransactionDto, PaymentTransaction>().ReverseMap();
+    CreateMap<OrderDto, Order>().ReverseMap();
+    CreateMap<OrderItemDto, OrderItem>().ReverseMap();
+    CreateMap<CartItemDto, CartItem>().ReverseMap();
+    CreateMap<RatingDto, Rating>().ReverseMap();
+    CreateMap<DiscountCodeDto, DiscountCode>().ReverseMap();
+    CreateMap<CustomerDto, ApplicationUser>()
+             .ForMember(dest => dest.DefaultAddress, opt => opt.MapFrom(src => src.DefaultAddress))
+             .ReverseMap();
 
-    // Category
-    CreateMap<Category, CategoryDTO>();
-    CreateMap<CategoryDTO, Category>();
-
-    // Rating
-    CreateMap<Rating, RatingDTO>();
-    CreateMap<RatingDTO, Rating>();
-
-    // User
-    CreateMap<AspNetUser, UserDTO>();
-    CreateMap<UserDTO, AspNetUser>();
-
-    // Role
-    CreateMap<AspNetRole, RoleDTO>();
-    CreateMap<RoleDTO, AspNetRole>();
+    // Auto map PagedResult<TSource> → PagedResult<TDestination>
+    CreateMap(typeof(PagedResult<>), typeof(PagedResult<>)).ConvertUsing(typeof(PagedResultConverter<,>));
   }
 }

@@ -1,3 +1,4 @@
+import { ProductResponseDto } from "@/api/product/productTypes";
 import {
   Table,
   TableBody,
@@ -5,12 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IProduct } from "@/types/product";
 
 interface ProductTableProps {
-  data: IProduct[];
-  onEdit: (product: IProduct) => void;
-  onDelete: (product: IProduct) => void;
+  data: ProductResponseDto[];
+  onEdit: (product: ProductResponseDto) => void;
+  onDelete: (product: ProductResponseDto) => void;
 }
 
 export default function ProductTable({
@@ -71,11 +71,10 @@ export default function ProductTable({
                   {product.price.toLocaleString()}đ
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {product.createdAt}
+                  {product.createdAt || "N/A"}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-theme-sm text-start">
                   <div className="flex items-center gap-2">
-                    {/* Nút Edit - giữ nguyên */}
                     <button
                       onClick={() => onEdit(product)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -96,7 +95,6 @@ export default function ProductTable({
                       Edit
                     </button>
 
-                    {/* Nút Delete – same style như edit */}
                     <button
                       onClick={() => onDelete(product)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-red-500 shadow-theme-xs hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-white/[0.03] dark:hover:text-red-300"

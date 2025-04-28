@@ -155,3 +155,79 @@ CustomerApp → [API Layer] → [Application Layer] → [Domain Layer] ← [Infr
 [5] Gọi API (Product, Order...) với access_token trong header         -->
 
 
+
+## 🏗️ TỔNG QUAN CÁC TẦNG (LAYERS)
+
+| **Layer**            | **Chứa gì?**                                                                 |
+|-----------------------|------------------------------------------------------------------------------|
+| **Domain Layer**      | 🔹 Entity thuần (POCO)                                                      |
+|                       | 🔹 Interface (repository/service)                                           |
+|                       | 🔹 Business Rules (domain logic nếu có)                                     |
+| **Infrastructure Layer** | 🔹 Triển khai EF Core DbContext                                           |
+|                       | 🔹 Mapping Fluent API                                                      |
+|                       | 🔹 Repository Implementation                                               |
+| **Application Layer** | 🔹 DTO/ViewModels                                                          |
+|                       | 🔹 Use Case Logic (Application Services)                                   |
+|                       | 🔹 Interface để gọi Infrastructure                                         |
+| **API Layer**         | 🔹 Controller                                                              |
+|                       | 🔹 Middleware                                                              |
+|                       | 🔹 Dependency Injection (DI), Routing                                      |
+
+
+## ✅ Phân loại chức năng theo domain
+
+### 🧁 Customer-Side (Frontend API)
+
+- Trang chủ: Category Menu + Featured Products
+- Xem sản phẩm theo Category
+- Xem chi tiết sản phẩm
+- Đánh giá sản phẩm
+
+### 🛠 Admin-Side (Backend API)
+
+- Quản lý Category
+- Quản lý Products
+- Quản lý Customers (Read-only)
+
+---
+
+## 🚀 Chiến lược triển khai API MVP
+
+### 1️⃣ Bắt đầu từ Backend - Admin API
+
+**Lý do:** Phải có dữ liệu → mới test frontend.
+
+**Ưu tiên:**
+
+- CRUD Categories (`/api/admin/categories`)
+- CRUD Products (`/api/admin/products`)
+        - Bao gồm: upload ảnh, tạo sửa xoá sản phẩm
+- View Customers (`/api/admin/customers`)
+
+---
+
+### 2️⃣ Tiếp theo là API cho Customer UI
+
+**Ưu tiên:**
+
+- `GET /api/categories` (GET Categories)
+- `GET /api/products/featured` (GET Featured Products)
+- `GET /api/products?categoryId=...` (GET Products by Category)
+- `GET /api/products/{id}` (GET Product Detail)
+- `POST /api/products/{id}/ratings` (POST Rating)
+
+---
+
+## ✅ Plan chi tiết
+
+| **Giai đoạn** | **Việc cần làm**                     | **Ưu tiên** |
+|---------------|--------------------------------------|-------------|
+| 1             | Tạo CRUD API cho Categories         | 🟢 High     |
+| 2             | Tạo CRUD API cho Products           | 🟢 High     |
+| 3             | API xem danh sách Users (Read)      | 🟡 Medium   |
+| 4             | Seed Data cho Category + Product    | 🟢 High     |
+| 5             | API GET Categories (cho Customer UI)| 🟢 High     |
+| 6             | API GET Featured Products           | 🟢 High     |
+| 7             | API GET Product by Category         | 🟢 High     |
+| 8             | API GET Product Detail              | 🟢 High     |
+| 9             | API POST Rating                     | 🟡 Medium   |
