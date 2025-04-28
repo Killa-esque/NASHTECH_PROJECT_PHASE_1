@@ -14,7 +14,7 @@ public class CartRepository : ICartRepository
     _context = context;
   }
 
-  public async Task<IEnumerable<CartItem>> GetCartItemsByUserAsync(Guid userId, int pageIndex, int pageSize)
+  public async Task<IEnumerable<CartItem>> GetCartItemsByUserAsync(string userId, int pageIndex, int pageSize)
   {
 
     Console.WriteLine($"Fetching cart items for user: {userId}, PageIndex: {pageIndex}, PageSize: {pageSize}");
@@ -25,7 +25,7 @@ public class CartRepository : ICartRepository
         .ToListAsync();
   }
 
-  public async Task<int> AddOrUpdateCartItemAsync(Guid userId, Guid productId, int quantity)
+  public async Task<int> AddOrUpdateCartItemAsync(string userId, Guid productId, int quantity)
   {
     var item = await _context.CartItems
         .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
@@ -49,7 +49,7 @@ public class CartRepository : ICartRepository
     return await _context.SaveChangesAsync();
   }
 
-  public async Task<int> RemoveCartItemAsync(Guid userId, Guid productId)
+  public async Task<int> RemoveCartItemAsync(string userId, Guid productId)
   {
     var item = await _context.CartItems
         .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
@@ -63,7 +63,7 @@ public class CartRepository : ICartRepository
     return 0;
   }
 
-  public async Task<int> GetTotalCountByUserAsync(Guid userId)
+  public async Task<int> GetTotalCountByUserAsync(string userId)
   {
     return await _context.CartItems
         .CountAsync(ci => ci.UserId == userId);

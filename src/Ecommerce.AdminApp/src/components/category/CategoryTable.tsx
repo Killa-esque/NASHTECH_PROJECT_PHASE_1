@@ -1,3 +1,4 @@
+import { CategoryResponseDto } from "@/api/category/categoryTypes";
 import {
   Table,
   TableBody,
@@ -5,12 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ICategory } from "@/types/category";
 
 interface CategoryTableProps {
-  data: ICategory[];
-  onEdit: (category: ICategory) => void;
-  onDelete: (category: ICategory) => void;
+  data: CategoryResponseDto[];
+  onEdit: (category: CategoryResponseDto) => void;
+  onDelete: (category: CategoryResponseDto) => void;
 }
 
 export default function CategoryTable({
@@ -22,7 +22,6 @@ export default function CategoryTable({
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
         <Table>
-          {/* Table Header */}
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
               <TableCell
@@ -57,8 +56,6 @@ export default function CategoryTable({
               </TableCell>
             </TableRow>
           </TableHeader>
-
-          {/* Table Body */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {data.map((category) => (
               <TableRow key={category.id}>
@@ -71,14 +68,13 @@ export default function CategoryTable({
                   {category.description}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {category.createdAt}
+                  {category.createdAt || "N/A"}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {category.updatedAt}
+                  {category.updatedAt || "N/A"}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-theme-sm text-start">
                   <div className="flex items-center gap-2">
-                    {/* Nút Edit - giữ nguyên */}
                     <button
                       onClick={() => onEdit(category)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -98,8 +94,6 @@ export default function CategoryTable({
                       </svg>
                       Edit
                     </button>
-
-                    {/* Nút Delete – same style như edit */}
                     <button
                       onClick={() => onDelete(category)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-red-500 shadow-theme-xs hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-white/[0.03] dark:hover:text-red-300"

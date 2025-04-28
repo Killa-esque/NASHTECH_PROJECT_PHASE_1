@@ -14,6 +14,11 @@ public class PagedResult<T>
     PageSize = pageSize;
   }
 
+  public PagedResult()
+  {
+    Items = Enumerable.Empty<T>(); // Khởi tạo Items để tránh null
+  }
+
   // Factory Method không cần <T>
   public static PagedResult<T> Create(IEnumerable<T> items, int count, int pageIndex, int pageSize)
   {

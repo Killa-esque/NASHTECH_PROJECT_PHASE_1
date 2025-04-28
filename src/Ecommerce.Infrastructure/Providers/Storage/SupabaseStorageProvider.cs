@@ -38,7 +38,7 @@ public class SupabaseStorageProvider : ISupabaseStorageService
     return $"{_supabaseUrl}/storage/v1/object/public/{_bucketName}/Product/{productId}/{uniqueFileName}";
   }
 
-  public async Task<string> UploadAvatarImageAsync(Stream fileStream, string fileName, string contentType, Guid userId)
+  public async Task<string> UploadAvatarImageAsync(Stream fileStream, string fileName, string contentType, string userId)
   {
     var uniqueFileName = $"{Guid.NewGuid()}-{fileName}";
 

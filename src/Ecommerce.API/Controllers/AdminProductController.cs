@@ -1,7 +1,6 @@
-using Ecommerce.Application.Common;
+using Ecommerce.Shared.Common;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Services;
-using Ecommerce.Shared.Common; // ✅ Import ApiResponse
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;

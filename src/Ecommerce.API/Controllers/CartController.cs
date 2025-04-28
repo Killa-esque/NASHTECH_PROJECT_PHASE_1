@@ -1,8 +1,7 @@
 using AutoMapper;
 using Ecommerce.API.Requests;
-using Ecommerce.Application.Common;
-using Ecommerce.Application.Services.Interfaces;
 using Ecommerce.Shared.Common;
+using Ecommerce.Application.Services.Interfaces;
 using Ecommerce.Shared.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,8 +58,9 @@ public class CartController : ControllerBase
     return Ok(ApiResponse<string>.Success("Item removed from cart."));
   }
 
-  private Guid GetUserId()
+  private string GetUserId()
   {
-    return Guid.Parse(User.FindFirst("sub")?.Value ?? Guid.Empty.ToString());
+    return "b831506c-d805-4b6b-8682-74892b7f86e7";
+    // return Guid.Parse(User.FindFirst("sub")?.Value ?? Guid.Empty.ToString());
   }
 }

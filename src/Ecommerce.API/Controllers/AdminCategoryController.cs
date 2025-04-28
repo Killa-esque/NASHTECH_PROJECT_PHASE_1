@@ -1,5 +1,5 @@
 using AutoMapper;
-using Ecommerce.Application.Common;
+using Ecommerce.Shared.Common;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Shared.Common; // ✅ Import ApiResponse
@@ -26,17 +26,7 @@ public class AdminCategoryController : ControllerBase
     if (!result.IsSuccess)
       return BadRequest(ApiResponse<string>.Fail(result.Message));
 
-
-
-    var customPaged = new
-    {
-      categories = result.Data.Items, // ✅ Đổi key từ Items → products
-      totalCount = result.Data.TotalCount,
-      pageIndex = result.Data.PageIndex,
-      pageSize = result.Data.PageSize
-    };
-
-    return Ok(ApiResponse<object>.Success(customPaged, result.Message)); // result.Data là PagedResult<CategoryDto>
+    return Ok(ApiResponse<object>.Success(result.Data, result.Message)); // result.Data là PagedResult<CategoryDto>
   }
 
   [HttpGet("{id}")]

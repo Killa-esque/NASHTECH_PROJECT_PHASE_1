@@ -1,5 +1,4 @@
 using AutoMapper;
-using Ecommerce.Application.Common;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Shared.Common;
 using Ecommerce.Shared.ViewModels;

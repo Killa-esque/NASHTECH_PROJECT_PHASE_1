@@ -1,5 +1,4 @@
 using AutoMapper;
-using Ecommerce.Application.Common;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Repositories;
 using Ecommerce.Application.Services.Interfaces;
@@ -20,7 +19,7 @@ public class CartService : ICartService
     _mapper = mapper;
   }
 
-  public async Task<Result<PagedResult<CartItemDto>>> GetCartItemsAsync(Guid userId, int pageIndex, int pageSize)
+  public async Task<Result<PagedResult<CartItemDto>>> GetCartItemsAsync(string userId, int pageIndex, int pageSize)
   {
     var cartItems = await _cartRepository.GetCartItemsByUserAsync(userId, pageIndex, pageSize);
     var totalCount = await _cartRepository.GetTotalCountByUserAsync(userId);
@@ -32,7 +31,7 @@ public class CartService : ICartService
     return Result.Success(pagedResult, "Cart items retrieved successfully.");
   }
 
-  public async Task<Result> AddToCartAsync(Guid userId, Guid productId, int quantity)
+  public async Task<Result> AddToCartAsync(string userId, Guid productId, int quantity)
   {
     var product = await _productRepository.GetByIdAsync(productId);
     if (product == null) throw new Exception("Product not found");
@@ -45,7 +44,7 @@ public class CartService : ICartService
     return Result.Success("Product added to cart successfully.");
   }
 
-  public async Task<Result> RemoveFromCartAsync(Guid userId, Guid productId)
+  public async Task<Result> RemoveFromCartAsync(string userId, Guid productId)
   {
     var affectedRows = await _cartRepository.RemoveCartItemAsync(userId, productId);
 

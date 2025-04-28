@@ -1,4 +1,4 @@
-using Ecommerce.Application.Common;
+using Ecommerce.Shared.Common;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Shared.Common;
 

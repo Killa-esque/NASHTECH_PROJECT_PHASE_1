@@ -1,31 +1,51 @@
+import {
+  CategoryResponseDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "@/api/category/categoryTypes";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface CategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; description: string }) => void;
   isEdit?: boolean;
-  initialData?: { name: string; description: string };
+  initialData?: Partial<CategoryResponseDto>;
+  onCreate?: (data: CreateCategoryDto) => void;
+  onEdit?: (data: UpdateCategoryDto) => void;
 }
 
 export default function CategoryModal({
   isOpen,
   onClose,
-  onSubmit,
   isEdit = false,
   initialData,
+  onCreate,
+  onEdit,
 }: CategoryModalProps) {
-  const [name, setName] = useState(initialData?.name || "");
-  const [description, setDescription] = useState(
-    initialData?.description || ""
-  );
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (isEdit && initialData) {
+      setName(initialData.name || "");
+      setDescription(initialData.description || "");
+    } else {
+      setName("");
+      setDescription("");
+    }
+  }, [isEdit, initialData]);
 
   const handleSubmit = () => {
-    onSubmit({ name, description });
+    const data: CreateCategoryDto | UpdateCategoryDto = { name, description };
+    if (isEdit && onEdit) {
+      onEdit(data as UpdateCategoryDto);
+    } else if (!isEdit && onCreate) {
+      onCreate(data as CreateCategoryDto);
+    }
     onClose();
   };
 

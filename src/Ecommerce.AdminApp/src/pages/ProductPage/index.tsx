@@ -1,7 +1,16 @@
-import { productData } from "@/data/product";
+import {
+  CreateProductDto,
+  ProductResponseDto,
+  UpdateProductDto,
+} from "@/api/product/productTypes";
 import { useModal } from "@/hooks/useModal";
-import { IProduct } from "@/types/product";
-import { useState } from "react";
+import {
+  useCreateProduct,
+  useDeleteProduct,
+  useGetProducts,
+  useUpdateProduct,
+} from "@/hooks/useProduct";
+import { useEffect, useState } from "react";
 
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
@@ -12,27 +21,79 @@ import Button from "@/components/ui/button/Button";
 import ConfirmDeleteModal from "@/components/ui/modal/ConfirmDeleteModal";
 
 export default function Product() {
-  const [products, setProducts] = useState<IProduct[]>(productData);
-  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductResponseDto | null>(null);
 
   const createModal = useModal();
   const editModal = useModal();
   const deleteModal = useModal();
+
+  const {
+    data: products = [],
+    isLoading,
+    error,
+    isFetching,
+  } = useGetProducts();
+
+  useEffect(() => {
+    console.log("useGetProducts State:", {
+      products,
+      isLoading,
+      isFetching,
+      error,
+    });
+  }, [products, isLoading, isFetching, error]);
+
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+  const deleteProductMutation = useDeleteProduct();
 
   const handleCreate = () => {
     setSelectedProduct(null);
     createModal.openModal();
   };
 
-  const handleEdit = (product: IProduct) => {
+  const handleEdit = (product: ProductResponseDto) => {
     setSelectedProduct(product);
     editModal.openModal();
   };
 
-  const handleDelete = (product: IProduct) => {
+  const handleDelete = (product: ProductResponseDto) => {
     setSelectedProduct(product);
     deleteModal.openModal();
   };
+
+  const handleCreateSubmit = async (data: CreateProductDto) => {
+    try {
+      await createProductMutation.mutateAsync(data);
+      createModal.closeModal();
+    } catch (err) {
+      console.error("Failed to create product:", err);
+    }
+  };
+
+  const handleEditSubmit = async (data: UpdateProductDto) => {
+    if (!selectedProduct) return;
+    try {
+      await updateProductMutation.mutateAsync({ id: selectedProduct.id, data });
+      editModal.closeModal();
+    } catch (err) {
+      console.error("Failed to update product:", err);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedProduct) return;
+    try {
+      await deleteProductMutation.mutateAsync(selectedProduct.id);
+      deleteModal.closeModal();
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+    }
+  };
+
+  if (isLoading || isFetching) return <div>Loading...</div>;
+  if (error) return <div>Error: {(error as Error).message}</div>;
 
   return (
     <div>
@@ -51,31 +112,24 @@ export default function Product() {
             </Button>
           }
         >
-          <ProductTable
-            data={products}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          {products.length === 0 ? (
+            <div className="py-4 text-center text-gray-500">
+              Chưa có sản phẩm nào. Nhấn "Thêm sản phẩm" để tạo mới.
+            </div>
+          ) : (
+            <ProductTable
+              data={products}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          )}
         </ComponentCard>
       </div>
 
       <ProductModal
         isOpen={createModal.isOpen}
         onClose={createModal.closeModal}
-        onSubmit={(data) => {
-          const newProduct: IProduct = {
-            id: Date.now(),
-            name: data.name || "Default Name",
-            categoryId: data.categoryId || 0,
-            description: data.description || "Default Description",
-            price: data.price || 0,
-            images: data.images || [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          setProducts((prev) => [...prev, newProduct]);
-          createModal.closeModal();
-        }}
+        onCreate={handleCreateSubmit}
       />
 
       <ProductModal
@@ -83,29 +137,13 @@ export default function Product() {
         onClose={editModal.closeModal}
         isEdit
         initialData={selectedProduct || {}}
-        onSubmit={(data) => {
-          if (!selectedProduct) return;
-          setProducts((prev) =>
-            prev.map((item) =>
-              item.id === selectedProduct.id
-                ? { ...item, ...data, updatedAt: new Date().toISOString() }
-                : item
-            )
-          );
-          editModal.closeModal();
-        }}
+        onEdit={handleEditSubmit}
       />
 
       <ConfirmDeleteModal
         isOpen={deleteModal.isOpen}
         onClose={deleteModal.closeModal}
-        onConfirm={() => {
-          if (!selectedProduct) return;
-          setProducts((prev) =>
-            prev.filter((item) => item.id !== selectedProduct.id)
-          );
-          deleteModal.closeModal();
-        }}
+        onConfirm={handleDeleteConfirm}
         objectType="sản phẩm"
         targetLabel={selectedProduct?.name}
       />

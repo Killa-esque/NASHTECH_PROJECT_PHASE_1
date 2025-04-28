@@ -3,8 +3,9 @@ using AutoMapper;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Shared.ViewModels;
-using Ecommerce.Application.Common;
 using Ecommerce.Shared.Common;
+using Ecommerce.Infrastructure.Entities;
+using Ecommerce.Application.Common;
 
 public class MappingProfile : Profile
 {
@@ -19,6 +20,7 @@ public class MappingProfile : Profile
     CreateMap<CartItemDto, CartItemViewModel>().ReverseMap();
     CreateMap<RatingDto, RatingViewModel>().ReverseMap();
     CreateMap<DiscountCodeDto, DiscountCodeViewModel>().ReverseMap();
+    // CreateMap<CustomerDto, CustomerViewModel>().ReverseMap();
 
     // DTO ⇄ Entity
     CreateMap<CategoryDto, Category>().ReverseMap();
@@ -29,6 +31,9 @@ public class MappingProfile : Profile
     CreateMap<CartItemDto, CartItem>().ReverseMap();
     CreateMap<RatingDto, Rating>().ReverseMap();
     CreateMap<DiscountCodeDto, DiscountCode>().ReverseMap();
+    CreateMap<CustomerDto, ApplicationUser>()
+             .ForMember(dest => dest.DefaultAddress, opt => opt.MapFrom(src => src.DefaultAddress))
+             .ReverseMap();
 
     // Auto map PagedResult<TSource> → PagedResult<TDestination>
     CreateMap(typeof(PagedResult<>), typeof(PagedResult<>)).ConvertUsing(typeof(PagedResultConverter<,>));

@@ -1,5 +1,4 @@
 using AutoMapper;
-using Ecommerce.Application.Common;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Repositories;
 using Ecommerce.Application.Interfaces.Services;

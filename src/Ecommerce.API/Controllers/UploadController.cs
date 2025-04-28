@@ -1,6 +1,5 @@
-using Ecommerce.Application.Common;
+using Ecommerce.Shared.Common;
 using Ecommerce.Application.Interfaces.Services;
-using Ecommerce.Shared.Common; // ✅ Import ApiResponse
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;
@@ -35,7 +34,7 @@ public class UploadController : ControllerBase
   }
 
   [HttpPost("upload-avatar/{userId}")]
-  public async Task<IActionResult> UploadAvatar(Guid userId, IFormFile file)
+  public async Task<IActionResult> UploadAvatar(string userId, IFormFile file)
   {
     if (file == null || file.Length == 0)
       return BadRequest(ApiResponse<string>.Fail("No file uploaded."));

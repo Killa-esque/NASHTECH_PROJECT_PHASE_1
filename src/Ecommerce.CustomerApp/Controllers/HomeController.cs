@@ -16,9 +16,9 @@ public class HomeController : Controller
     // var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
     // var idToken = await HttpContext.GetTokenAsync("id_token");
     // var expiresAt = await HttpContext.GetTokenAsync("expires_at");
-    var categories = await _categoryService.GetCategoriesForMenuAsync(1, 10);
+    // var categories = await _categoryService.GetCategoriesForMenuAsync(1, 10);
 
-    Console.WriteLine(categories.Count);
+    // Console.WriteLine(categories.Count);
 
     return View();
   }
