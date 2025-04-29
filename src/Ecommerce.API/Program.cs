@@ -93,7 +93,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
-            "http://localhost:3000",  // React Admin
+            "https://localhost:3000",  // React Admin
             "https://localhost:5002"  // Customer App (ASP.NET MVC)
         )
         .AllowAnyHeader()

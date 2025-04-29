@@ -1,3 +1,4 @@
+// src/components/product/ProductTable.tsx
 import { ProductResponseDto } from "@/api/product/productTypes";
 import {
   Table,
@@ -6,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import dayjs from "dayjs";
 
 interface ProductTableProps {
   data: ProductResponseDto[];
@@ -24,6 +26,12 @@ export default function ProductTable({
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Hình ảnh
+              </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -60,6 +68,13 @@ export default function ProductTable({
             {data.map((product) => (
               <TableRow key={product.id}>
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
+                  <img
+                    src={product.imageUrl || "/images/placeholder.jpg"}
+                    alt={product.name}
+                    className="h-12 w-12 object-cover rounded"
+                  />
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6 text-start">
                   <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                     {product.name}
                   </span>
@@ -71,7 +86,9 @@ export default function ProductTable({
                   {product.price.toLocaleString()}đ
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {product.createdAt || "N/A"}
+                  {product.createdAt
+                    ? dayjs(product.createdAt).format("DD/MM/YYYY")
+                    : "N/A"}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-theme-sm text-start">
                   <div className="flex items-center gap-2">
@@ -94,7 +111,6 @@ export default function ProductTable({
                       </svg>
                       Edit
                     </button>
-
                     <button
                       onClick={() => onDelete(product)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-red-500 shadow-theme-xs hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-white/[0.03] dark:hover:text-red-300"

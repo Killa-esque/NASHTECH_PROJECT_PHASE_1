@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Primitives;
 using OpenIddict.Abstractions;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthorizationServer.Services;
 
@@ -50,16 +51,26 @@ public class AuthorizationService
     return true;
   }
 
-  public static List<string> GetDestinations(ClaimsIdentity identity, Claim claim)
+  public static IEnumerable<string> GetDestinations(ClaimsIdentity identity, Claim claim)
   {
-    var destinations = new List<string>();
-
-    if (claim.Type is OpenIddictConstants.Claims.Name or OpenIddictConstants.Claims.Email)
+    // Validate inputs to prevent runtime errors
+    if (identity == null || claim == null)
     {
-      destinations.Add(OpenIddictConstants.Destinations.AccessToken);
-      destinations.Add(OpenIddictConstants.Destinations.IdentityToken);
+      throw new ArgumentNullException(identity == null ? nameof(identity) : nameof(claim));
     }
 
-    return destinations;
+    switch (claim.Type)
+    {
+      case Claims.Subject: // sub
+      case Claims.Name:    // name
+      case Claims.Email:   // email
+        return new[] { Destinations.AccessToken, Destinations.IdentityToken };
+
+      case Claims.Role:
+        return new[] { Destinations.AccessToken, Destinations.IdentityToken };
+
+      default:
+        return Array.Empty<string>(); 
+    }
   }
 }

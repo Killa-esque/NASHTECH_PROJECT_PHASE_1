@@ -103,28 +103,28 @@ public class ClientsSeeder
       ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
       DisplayName = "Ecommerce Admin Panel (React)",
       ConsentType = ConsentTypes.Explicit,
-
       RedirectUris =
             {
-                new Uri("http://localhost:3000/oauth/callback")
+                new Uri("https://localhost:3000/oauth/callback")
             },
       PostLogoutRedirectUris =
             {
-                new Uri("http://localhost:3000/")
+                new Uri("https://localhost:3000/signin")
             },
-
       Permissions =
             {
                 Permissions.Endpoints.Authorization,
                 Permissions.Endpoints.Token,
                 Permissions.Endpoints.EndSession,
                 Permissions.GrantTypes.AuthorizationCode,
+                Permissions.GrantTypes.RefreshToken,
                 Permissions.ResponseTypes.Code,
 
                 Permissions.Scopes.Email,
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
-                $"{Permissions.Prefixes.Scope}ecommerce_api"
+                $"{Permissions.Prefixes.Scope}ecommerce_api",
+                $"{Permissions.Prefixes.Scope}offline_access"
             },
     });
   }

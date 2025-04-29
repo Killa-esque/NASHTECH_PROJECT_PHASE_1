@@ -1,3 +1,4 @@
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
@@ -10,15 +11,12 @@ export default defineConfig({
     svgr({
       svgrOptions: {
         icon: true,
-        // This will transform your SVG to a React component
         exportType: "named",
         namedExport: "ReactComponent",
       },
     }),
+    basicSsl(),
   ],
-  define: {
-    "process.env": process.env,
-  },
   server: {
     port: Number(process.env.VITE_PORT) || 3000,
   },

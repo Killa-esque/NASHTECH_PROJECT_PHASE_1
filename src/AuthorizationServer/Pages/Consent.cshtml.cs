@@ -23,13 +23,30 @@ public class ConsentModel : PageModel
 
   public async Task<IActionResult> OnPostAsync(string grant)
   {
-    User.SetClaim(Consts.ConsentNaming, grant);
+    var scheme = ReturnUrl?.Contains("client_id=customer_client") == true
+        ? "CustomerScheme"
+        : "AdminScheme";
 
-    var principal = new ClaimsPrincipal(new ClaimsIdentity(User.Claims, IdentityConstants.ApplicationScheme));
+    var identity = new ClaimsIdentity(User.Claims, scheme);
+    identity.AddClaim(new Claim(Consts.ConsentNaming, grant)); // 👈 Add consent claim
 
-    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal);
+    var principal = new ClaimsPrincipal(identity);
+    await HttpContext.SignInAsync(scheme, principal); // 👈 Use correct scheme
 
     return Redirect(ReturnUrl ?? "/");
   }
+
+
+  // public async Task<IActionResult> OnPostAsync(string grant)
+  // {
+  //   User.SetClaim(Consts.ConsentNaming, grant);
+
+  //   var scheme = ReturnUrl?.Contains("client_id=customer_client") == true ? "CustomerScheme" : "AdminScheme";
+  //   var principal = new ClaimsPrincipal(new ClaimsIdentity(User.Claims, scheme));
+
+  //   await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal);
+
+  //   return Redirect(ReturnUrl ?? "/");
+  // }
 
 }
