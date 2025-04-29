@@ -1,8 +1,10 @@
+// src/pages/ProductPage/index.tsx
 import {
   CreateProductDto,
   ProductResponseDto,
   UpdateProductDto,
 } from "@/api/product/productTypes";
+import { useAuth } from "@/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
 import {
   useCreateProduct,
@@ -11,6 +13,7 @@ import {
   useUpdateProduct,
 } from "@/hooks/useProduct";
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
@@ -19,8 +22,10 @@ import ProductModal from "@/components/product/ProductModal";
 import ProductTable from "@/components/product/ProductTable";
 import Button from "@/components/ui/button/Button";
 import ConfirmDeleteModal from "@/components/ui/modal/ConfirmDeleteModal";
+import { message } from "antd";
 
 export default function Product() {
+  const { isAuthenticated, isAdminUser, isLoading: authLoading } = useAuth();
   const [selectedProduct, setSelectedProduct] =
     useState<ProductResponseDto | null>(null);
 
@@ -31,8 +36,8 @@ export default function Product() {
   const {
     data: products = [],
     isLoading,
-    error,
     isFetching,
+    error,
   } = useGetProducts();
 
   useEffect(() => {
@@ -42,6 +47,9 @@ export default function Product() {
       isFetching,
       error,
     });
+    if (error) {
+      message.error(`Failed to fetch products: ${(error as Error).message}`);
+    }
   }, [products, isLoading, isFetching, error]);
 
   const createProductMutation = useCreateProduct();
@@ -69,6 +77,7 @@ export default function Product() {
       createModal.closeModal();
     } catch (err) {
       console.error("Failed to create product:", err);
+      message.error("Failed to create product");
     }
   };
 
@@ -79,6 +88,7 @@ export default function Product() {
       editModal.closeModal();
     } catch (err) {
       console.error("Failed to update product:", err);
+      message.error("Failed to update product");
     }
   };
 
@@ -89,11 +99,25 @@ export default function Product() {
       deleteModal.closeModal();
     } catch (err) {
       console.error("Failed to delete product:", err);
+      message.error("Failed to delete product");
     }
   };
 
-  if (isLoading || isFetching) return <div>Loading...</div>;
-  if (error) return <div>Error: {(error as Error).message}</div>;
+  if (authLoading || isLoading || isFetching) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/signin" replace />;
+  }
+
+  if (!isAdminUser) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (error) {
+    return <div>Error: {(error as Error).message}</div>;
+  }
 
   return (
     <div>

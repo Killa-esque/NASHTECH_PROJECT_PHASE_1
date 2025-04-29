@@ -1,0 +1,26 @@
+@page
+@model AuthorizationServer.Pages.Authenticate_CustomerModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+  ViewData["Title"] = "Customer Login";
+}
+
+<h2>Đăng nhập Khách hàng</h2>
+
+<form method="post">
+  <div asp-validation-summary="All" class="text-danger"></div>
+
+  <div class="form-group">
+    <label asp-for="Input.Email"></label>
+    <input asp-for="Input.Email" class="form-control" />
+  </div>
+
+  <div class="form-group">
+    <label asp-for="Input.Password"></label>
+    <input asp-for="Input.Password" class="form-control" type="password" />
+  </div>
+
+  <input type="hidden" asp-for="ReturnUrl" />
+
+  <button type="submit" class="btn btn-success">Đăng nhập</button>
+</form>

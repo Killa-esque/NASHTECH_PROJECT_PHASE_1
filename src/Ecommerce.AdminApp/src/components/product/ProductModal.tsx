@@ -10,15 +10,17 @@ import Label from "@/components/form/Label";
 import Select from "@/components/form/Select";
 import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
+import { message } from "antd";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   isEdit?: boolean;
   initialData?: Partial<ProductResponseDto>;
-  onCreate?: (data: CreateProductDto) => void; // For create mode
-  onEdit?: (data: UpdateProductDto) => void; // For edit mode
+  onCreate?: (data: CreateProductDto) => void;
+  onEdit?: (data: UpdateProductDto) => void;
 }
 
 const categoryOptions = [
@@ -26,6 +28,19 @@ const categoryOptions = [
   { value: "2", label: "Bánh mặn" },
   { value: "3", label: "Bánh ngọt" },
 ];
+
+// Schema validation cho CreateProductDto và UpdateProductDto
+const ProductFormSchema = z.object({
+  name: z.string().min(1, "Tên sản phẩm không được để trống"),
+  description: z.string().min(1, "Mô tả không được để trống"),
+  price: z.number().min(0, "Giá phải lớn hơn hoặc bằng 0"),
+  categoryId: z.string().min(1, "Vui lòng chọn danh mục"),
+  imageUrl: z.string().url("Hình ảnh phải là một URL hợp lệ").optional(),
+  stock: z
+    .number()
+    .min(0, "Số lượng tồn kho phải lớn hơn hoặc bằng 0")
+    .optional(),
+});
 
 export default function ProductModal({
   isOpen,
@@ -40,6 +55,7 @@ export default function ProductModal({
   const [price, setPrice] = useState(0);
   const [categoryId, setCategoryId] = useState("1");
   const [imageUrl, setImageUrl] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (isEdit && initialData) {
@@ -49,24 +65,38 @@ export default function ProductModal({
       setCategoryId(initialData.categoryId || "1");
       setImageUrl(initialData.imageUrl || "");
     } else {
-      // Reset form when creating a new product
       setName("");
       setDescription("");
       setPrice(0);
       setCategoryId("1");
       setImageUrl("");
     }
+    setErrors({});
   }, [isEdit, initialData]);
 
   const handleSubmit = () => {
-    const data: CreateProductDto | UpdateProductDto = {
+    const data = {
       name,
       description,
       price,
       categoryId,
-      imageUrl,
+      imageUrl: imageUrl || undefined,
       stock: isEdit ? initialData?.stock : 0,
     };
+
+    // Validate dữ liệu
+    const result = ProductFormSchema.safeParse(data);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0]] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      message.error("Vui lòng kiểm tra lại thông tin");
+      return;
+    }
 
     if (isEdit && onEdit) {
       onEdit(data as UpdateProductDto);
@@ -106,6 +136,7 @@ export default function ProductModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Nhập tên sản phẩm"
+            error={!!errors.name}
           />
         </div>
 
@@ -115,6 +146,7 @@ export default function ProductModal({
             placeholder="Nhập mô tả sản phẩm"
             value={description}
             onChange={(val) => setDescription(val)}
+            error={!!errors.description}
           />
         </div>
 
@@ -126,6 +158,7 @@ export default function ProductModal({
             value={price}
             onChange={(e) => setPrice(Number(e.target.value))}
             placeholder="Nhập giá sản phẩm"
+            error={!!errors.price}
           />
         </div>
 
@@ -135,12 +168,16 @@ export default function ProductModal({
             options={categoryOptions}
             defaultValue={categoryId}
             onChange={(val) => setCategoryId(val)}
+            className={!!errors.categoryId ? "border-red-500" : ""}
           />
         </div>
 
         <div>
           <Label htmlFor="image">Hình ảnh</Label>
           <FileInput onChange={handleFileChange} />
+          {errors.imageUrl && (
+            <p className="mt-1 text-sm text-red-500">{errors.imageUrl}</p>
+          )}
         </div>
       </div>
 

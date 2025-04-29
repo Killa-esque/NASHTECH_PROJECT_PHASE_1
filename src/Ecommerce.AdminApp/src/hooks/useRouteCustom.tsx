@@ -1,8 +1,13 @@
+// src/hooks/useRouteCustom.tsx
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import AppLayout from "@/layout/AppLayout";
 import { lazy } from "react";
 import { useRoutes } from "react-router-dom";
 
+const Callback = lazy(() => import("@/pages/AuthPage/Callback"));
 const SignIn = lazy(() => import("@/pages/AuthPage/SignIn"));
+const SilentRenew = lazy(() => import("@/pages/AuthPage/SilentRenew"));
+const Unauthorized = lazy(() => import("@/pages/OtherPage/Unauthorized"));
 const NotFound = lazy(() => import("@/pages/OtherPage/NotFound"));
 const UserProfiles = lazy(() => import("@/pages/UserProfiles"));
 const Category = lazy(() => import("@/pages/CategoryPage"));
@@ -29,28 +34,164 @@ function useRouteCustom() {
     {
       element: <AppLayout />,
       children: [
-        { path: "/", element: <Home /> },
-        { path: "/profile", element: <UserProfiles /> },
-        { path: "/categories", element: <Category /> },
-        { path: "/products", element: <Product /> },
-        { path: "/customers", element: <Customer /> },
-        { path: "/admin/orders", element: <OrderList /> },
-        { path: "/admin/orders/:orderId", element: <OrderDetail /> },
-        { path: "/calendar", element: <Calendar /> },
-        { path: "/blank", element: <Blank /> },
-        { path: "/form-elements", element: <FormElements /> },
-        { path: "/basic-tables", element: <BasicTables /> },
-        { path: "/alerts", element: <Alerts /> },
-        { path: "/avatars", element: <Avatars /> },
-        { path: "/badge", element: <Badges /> },
-        { path: "/buttons", element: <Buttons /> },
-        { path: "/images", element: <Images /> },
-        { path: "/videos", element: <Videos /> },
-        { path: "/line-chart", element: <LineChart /> },
-        { path: "/bar-chart", element: <BarChart /> },
+        {
+          path: "/",
+          element: (
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/profile",
+          element: (
+            <ProtectedRoute>
+              <UserProfiles />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/categories",
+          element: (
+            <ProtectedRoute>
+              <Category />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/products",
+          element: (
+            <ProtectedRoute>
+              <Product />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/customers",
+          element: (
+            <ProtectedRoute>
+              <Customer />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/orders",
+          element: (
+            <ProtectedRoute>
+              <OrderList />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/orders/:orderId",
+          element: (
+            <ProtectedRoute>
+              <OrderDetail />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/calendar",
+          element: (
+            <ProtectedRoute>
+              <Calendar />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/blank",
+          element: (
+            <ProtectedRoute>
+              <Blank />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/form-elements",
+          element: (
+            <ProtectedRoute>
+              <FormElements />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/basic-tables",
+          element: (
+            <ProtectedRoute>
+              <BasicTables />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/alerts",
+          element: (
+            <ProtectedRoute>
+              <Alerts />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/avatars",
+          element: (
+            <ProtectedRoute>
+              <Avatars />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/badge",
+          element: (
+            <ProtectedRoute>
+              <Badges />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/buttons",
+          element: (
+            <ProtectedRoute>
+              <Buttons />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/images",
+          element: (
+            <ProtectedRoute>
+              <Images />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/videos",
+          element: (
+            <ProtectedRoute>
+              <Videos />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/line-chart",
+          element: (
+            <ProtectedRoute>
+              <LineChart />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/bar-chart",
+          element: (
+            <ProtectedRoute>
+              <BarChart />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
     { path: "/signin", element: <SignIn /> },
+    { path: "/silent-renew", element: <SilentRenew /> },
+    { path: "/oauth/callback", element: <Callback /> },
+    { path: "/unauthorized", element: <Unauthorized /> },
     { path: "*", element: <NotFound /> },
   ]);
 }

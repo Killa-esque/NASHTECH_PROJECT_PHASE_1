@@ -7,6 +7,12 @@ using Ecommerce.Infrastructure.Data;
 using AuthorizationServer.Services;
 using AuthorizationServer.Seeders;
 using AuthorizationServer.Mapping;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.Json;
+using OpenIddict.Server;
+using OpenIddict.Abstractions;
+using System.Security.Claims;
+using Microsoft.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,27 +26,53 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+// ⚙️ Cấu hình nhiều cookie scheme: AdminScheme & CustomerScheme
+builder.Services.AddAuthentication()
+    .AddCookie("AdminScheme", options =>
+    {
+        options.Cookie.Name = ".AspNetCore.Identity.Admin";
+        options.LoginPath = "/Authenticate_Admin";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
+    })
+    .AddCookie("CustomerScheme", options =>
+    {
+        options.Cookie.Name = ".AspNetCore.Identity.Customer";
+        options.LoginPath = "/Authenticate_Customer";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
+    });
+
+// builder.Services.ConfigureApplicationCookie(options =>
+// {
+//     options.Cookie.Name = ".AspNetCore.Identity";
+//     options.LoginPath = "/Authenticate";
+//     options.ExpireTimeSpan = TimeSpan.FromDays(7);
+//     options.SlidingExpiration = true;
+// });
+
+
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
         options.UseEntityFrameworkCore()
             .UseDbContext<AppDbContext>();
-
     })
     .AddServer(options =>
     {
         options.SetAuthorizationEndpointUris("connect/authorize")
-                .SetEndSessionEndpointUris("connect/logout")
-                .SetTokenEndpointUris("connect/token")
-                .SetRevocationEndpointUris("connect/revocation");
+               .SetEndSessionEndpointUris("connect/logout")
+               .SetTokenEndpointUris("connect/token")
+               .SetRevocationEndpointUris("connect/revocation")
+               .SetUserInfoEndpointUris("connect/userinfo");
 
         options.RegisterScopes(Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess, "ecommerce_api");
 
-        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30)); // ví dụ
+        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
         options.SetRefreshTokenLifetime(TimeSpan.FromDays(14));
 
         options.AllowAuthorizationCodeFlow()
-                .AllowRefreshTokenFlow();
+               .AllowRefreshTokenFlow();
 
         options.AddEncryptionKey(new SymmetricSecurityKey(Convert.FromBase64String("DRjd/GnduI3Efzen9V9BvbNUfc/VKgXltV7Kbk9sMkY=")));
 
@@ -48,26 +80,15 @@ builder.Services.AddOpenIddict()
                .AddDevelopmentSigningCertificate();
 
         options.UseAspNetCore()
-                .EnableTokenEndpointPassthrough()
-                .EnableEndSessionEndpointPassthrough()
-                .EnableAuthorizationEndpointPassthrough();
+               .EnableTokenEndpointPassthrough()
+               .EnableEndSessionEndpointPassthrough()
+               .EnableAuthorizationEndpointPassthrough();
+
     });
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.Name = ".AspNetCore.Identity.Application";
-    options.LoginPath = "/Authenticate";
-    options.ExpireTimeSpan = TimeSpan.FromDays(7);
-    options.SlidingExpiration = true;
-
-});
-
 
 builder.Services.AddTransient<AuthorizationService>();
 builder.Services.AddTransient<ClientsSeeder>();
 
-
-// Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -77,7 +98,6 @@ builder.Services.AddControllers()
     });
 builder.Services.AddRazorPages();
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -85,16 +105,14 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://localhost:5001", "https://localhost:5002", "http://localhost:3000")
+        policy.WithOrigins("https://localhost:5001", "https://localhost:5002", "https://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });
 });
 
-// Register AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-
 
 var app = builder.Build();
 
