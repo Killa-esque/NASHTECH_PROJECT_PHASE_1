@@ -11,39 +11,53 @@ public class CartRepository : ICartRepository
 
   public CartRepository(AppDbContext context)
   {
-    _context = context;
+    _context = context ?? throw new ArgumentNullException(nameof(context));
   }
 
   public async Task<IEnumerable<CartItem>> GetCartItemsByUserAsync(string userId, int pageIndex, int pageSize)
   {
-
-    Console.WriteLine($"Fetching cart items for user: {userId}, PageIndex: {pageIndex}, PageSize: {pageSize}");
     return await _context.CartItems
+        .AsNoTracking()
         .Where(ci => ci.UserId == userId)
         .Skip((pageIndex - 1) * pageSize)
         .Take(pageSize)
-        .ToListAsync();
+        .ToListAsync()
+        .ConfigureAwait(false);
   }
 
-  public async Task<int> AddOrUpdateCartItemAsync(string userId, Guid productId, int quantity)
+  public async Task<int> GetTotalCountByUserAsync(string userId)
   {
-    var item = await _context.CartItems
+    return await _context.CartItems
+        .CountAsync(ci => ci.UserId == userId)
+        .ConfigureAwait(false);
+  }
+  public async Task<int> AddOrUpdateCartItemAsync(string userId, Guid productId, int quantity, bool isUpdate = false)
+  {
+    var cartItem = await _context.CartItems
         .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
 
-    if (item == null)
+    if (cartItem == null)
     {
-      item = new CartItem
+      cartItem = new CartItem
       {
+        Id = Guid.NewGuid(),
         UserId = userId,
         ProductId = productId,
-        Quantity = quantity
+        Quantity = quantity,
+        AddedDate = DateTime.UtcNow
       };
-      _context.CartItems.Add(item);
+      await _context.CartItems.AddAsync(cartItem);
     }
     else
     {
-      item.Quantity += quantity;
-      _context.CartItems.Update(item);
+      if (isUpdate)
+      {
+        cartItem.Quantity = quantity; // Update quantity
+      }
+      else
+      {
+        cartItem.Quantity += quantity; // Add to existing quantity
+      }
     }
 
     return await _context.SaveChangesAsync();
@@ -51,21 +65,22 @@ public class CartRepository : ICartRepository
 
   public async Task<int> RemoveCartItemAsync(string userId, Guid productId)
   {
-    var item = await _context.CartItems
+    var cartItem = await _context.CartItems
         .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
 
-    if (item != null)
-    {
-      _context.CartItems.Remove(item);
-      return await _context.SaveChangesAsync();
-    }
+    if (cartItem == null) return 0;
 
-    return 0;
+    _context.CartItems.Remove(cartItem);
+    return await _context.SaveChangesAsync();
   }
 
-  public async Task<int> GetTotalCountByUserAsync(string userId)
+  public async Task<int> ClearCartAsync(string userId)
   {
-    return await _context.CartItems
-        .CountAsync(ci => ci.UserId == userId);
+    var cartItems = await _context.CartItems
+        .Where(ci => ci.UserId == userId)
+        .ToListAsync();
+
+    _context.CartItems.RemoveRange(cartItems);
+    return await _context.SaveChangesAsync();
   }
 }

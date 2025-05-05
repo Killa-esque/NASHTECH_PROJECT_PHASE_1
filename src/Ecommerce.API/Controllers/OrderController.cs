@@ -1,6 +1,6 @@
 using AutoMapper;
 using Ecommerce.Shared.Common;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,13 +29,14 @@ public class OrderController : ControllerBase
 
     if (result.IsSuccess)
       return Ok(ApiResponse<Guid>.Success(result.Data, result.Message));
-    return BadRequest(ApiResponse<string>.Fail(result.Error));
+    return BadRequest(ApiResponse<Guid>.Fail(result.Error));
   }
 
   // 2. Xem chi tiết đơn hàng
   [HttpGet("{orderId}")]
   public async Task<IActionResult> GetOrderDetail(Guid orderId)
   {
+
     var result = await _orderService.GetOrderDetailsAsync(orderId);
 
     if (result.IsSuccess)
@@ -59,6 +60,8 @@ public class OrderController : ControllerBase
   [HttpPost("{orderId}/cancel")]
   public async Task<IActionResult> CancelOrder(Guid orderId)
   {
+    Console.WriteLine($"GetOrderDetail: {orderId}");
+
     var result = await _orderService.CancelOrderAsync(orderId);
 
     if (result.IsSuccess)
@@ -66,10 +69,21 @@ public class OrderController : ControllerBase
     return BadRequest(ApiResponse<string>.Fail(result.Error));
   }
 
+    // Get order code
+  [HttpGet("code/{orderId}")]
+  public async Task<IActionResult> GetOrderCode(Guid orderId)
+  {
+    var result = await _orderService.GetOrderCodeAsync(orderId);
+
+    if (result.IsSuccess)
+      return Ok(ApiResponse<string>.Success(result.Data, result.Message));
+    return NotFound(ApiResponse<string>.Fail(result.Error));
+  }
+
   // Helper lấy userId từ token
   private string GetUserId()
   {
-    return "b831506c-d805-4b6b-8682-74892b7f86e7";
+    return "a2ad953e-1482-4cf2-9b94-41c88aeb90e3";
     // return Guid.Parse(User.FindFirst("sub")?.Value ?? Guid.Empty.ToString());
   }
 }

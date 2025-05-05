@@ -2,6 +2,7 @@ using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthorizationServer.Seeders;
+
 public class ClientsSeeder
 {
   private readonly IServiceProvider _serviceProvider;
@@ -33,22 +34,25 @@ public class ClientsSeeder
     await manager.CreateAsync(new OpenIddictApplicationDescriptor
     {
       ClientId = "swagger_client",
-      ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
+      ClientSecret = "SwaggerSecret123-4567-89AB-CDEF",
       RedirectUris =
-      {
-          new Uri("https://localhost:5001/swagger/oauth2-redirect.html")
-      },
+            {
+                new Uri("https://localhost:5001/swagger/oauth2-redirect.html")
+            },
       Permissions =
-      {
-          Permissions.Endpoints.Authorization,
-          Permissions.Endpoints.Token,
-          Permissions.GrantTypes.AuthorizationCode,
-          Permissions.GrantTypes.RefreshToken,
-          Permissions.ResponseTypes.Code,
-          Permissions.Endpoints.Revocation,
-          $"{Permissions.Prefixes.Scope}ecommerce_api",
-          $"{Permissions.Prefixes.Scope}offline_access"
-      },
+            {
+                Permissions.Endpoints.Authorization,
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.AuthorizationCode,
+                Permissions.GrantTypes.RefreshToken,
+                Permissions.ResponseTypes.Code,
+                Permissions.Endpoints.Revocation,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                $"{Permissions.Prefixes.Scope}ecommerce_api",
+                $"{Permissions.Prefixes.Scope}offline_access"
+            }
     });
   }
 
@@ -58,7 +62,6 @@ public class ClientsSeeder
     var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
 
     var existingScope = await scopeManager.FindByNameAsync("ecommerce_api");
-
     if (existingScope != null)
     {
       await scopeManager.DeleteAsync(existingScope);
@@ -71,7 +74,6 @@ public class ClientsSeeder
       Resources = { "ecommerce_resource_server" }
     });
 
-    // ✅ Thêm scope offline_access
     var existingOfflineScope = await scopeManager.FindByNameAsync(Scopes.OfflineAccess);
     if (existingOfflineScope != null)
     {
@@ -82,7 +84,7 @@ public class ClientsSeeder
     {
       Name = Scopes.OfflineAccess,
       DisplayName = "Offline access",
-      Resources = { "ecommerce_resource_server" } // hoặc để trống nếu không cần gắn với resource cụ thể
+      Resources = { }
     });
   }
 
@@ -100,7 +102,7 @@ public class ClientsSeeder
     await manager.CreateAsync(new OpenIddictApplicationDescriptor
     {
       ClientId = "admin_client",
-      ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
+      ClientSecret = null, // SPA không dùng secret
       DisplayName = "Ecommerce Admin Panel (React)",
       ConsentType = ConsentTypes.Explicit,
       RedirectUris =
@@ -119,13 +121,13 @@ public class ClientsSeeder
                 Permissions.GrantTypes.AuthorizationCode,
                 Permissions.GrantTypes.RefreshToken,
                 Permissions.ResponseTypes.Code,
-
                 Permissions.Scopes.Email,
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 $"{Permissions.Prefixes.Scope}ecommerce_api",
-                $"{Permissions.Prefixes.Scope}offline_access"
-            },
+                $"{Permissions.Prefixes.Scope}offline_access",
+                Permissions.Prefixes.GrantType + "code" // Hỗ trợ PKCE
+            }
     });
   }
 
@@ -143,19 +145,17 @@ public class ClientsSeeder
     await manager.CreateAsync(new OpenIddictApplicationDescriptor
     {
       ClientId = "customer_client",
-      ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
+      ClientSecret = "CustomerSecret123-4567-89AB-CDEF",
       DisplayName = "Ecommerce Customer App (ASP.NET MVC)",
       ConsentType = ConsentTypes.Explicit,
-
       RedirectUris =
             {
                 new Uri("https://localhost:5002/signin-oidc")
             },
       PostLogoutRedirectUris =
             {
-                new Uri("https://localhost:5002/signout-callback-oidc")
+                new Uri("https://localhost:5002")
             },
-
       Permissions =
             {
                 Permissions.Endpoints.Authorization,
@@ -164,13 +164,12 @@ public class ClientsSeeder
                 Permissions.GrantTypes.AuthorizationCode,
                 Permissions.GrantTypes.RefreshToken,
                 Permissions.ResponseTypes.Code,
-
                 Permissions.Scopes.Email,
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 $"{Permissions.Prefixes.Scope}ecommerce_api",
                 $"{Permissions.Prefixes.Scope}offline_access"
-            },
+            }
     });
   }
 }

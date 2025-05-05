@@ -1,5 +1,5 @@
 using AutoMapper;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Repositories;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Domain.Entities;
@@ -24,8 +24,6 @@ public class ProductService : IProductService
       return Result.Failure("Product cannot be null.");
 
     var product = _mapper.Map<Product>(productDto);
-    product.ImageUrl ??= "";
-
     var exists = await _productRepository.ExistsAsync(product.Name);
     if (exists)
       return Result.Failure("Product already exists.");
@@ -44,10 +42,9 @@ public class ProductService : IProductService
 
     var product = await _productRepository.GetByIdAsync(id);
     if (product == null)
-      return Result.Failure("Product not exists.");
+      return Result.Failure("Product does not exist.");
 
     var affectedRows = await _productRepository.DeleteAsync(id);
-
     if (affectedRows == 0)
       return Result.Failure("Failed to delete product.");
 
@@ -57,13 +54,18 @@ public class ProductService : IProductService
   public async Task<Result<PagedResult<ProductDto>>> GetAllProductsAsync(int pageIndex, int pageSize)
   {
     var products = await _productRepository.GetAllAsync(pageIndex, pageSize);
-
-    var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
-
     var totalCount = await _productRepository.CountAsync();
 
-    var pagedResult = PagedResult<ProductDto>.Create(productDtos, totalCount, pageIndex, pageSize);
+    var productDtos = new List<ProductDto>();
+    foreach (var product in products)
+    {
+      var productDto = _mapper.Map<ProductDto>(product);
+      var images = await _productRepository.GetProductImagesAsync(product.Id);
+      productDto.ImageUrls = images.Select(i => i.ImageUrl).ToList();
+      productDtos.Add(productDto);
+    }
 
+    var pagedResult = PagedResult<ProductDto>.Create(productDtos, totalCount, pageIndex, pageSize);
     return Result.Success(pagedResult);
   }
 
@@ -73,10 +75,17 @@ public class ProductService : IProductService
     if (products == null)
       return Result.Failure<PagedResult<ProductDto>>("Failed to load featured products.");
 
-    var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
     var totalCount = await _productRepository.CountFeaturedProductsAsync();
-    var pagedResult = PagedResult<ProductDto>.Create(productDtos, totalCount, pageIndex, pageSize);
+    var productDtos = new List<ProductDto>();
+    foreach (var product in products)
+    {
+      var productDto = _mapper.Map<ProductDto>(product);
+      var images = await _productRepository.GetProductImagesAsync(product.Id);
+      productDto.ImageUrls = images.Select(i => i.ImageUrl).ToList();
+      productDtos.Add(productDto);
+    }
 
+    var pagedResult = PagedResult<ProductDto>.Create(productDtos, totalCount, pageIndex, pageSize);
     return Result.Success(pagedResult, "Featured products retrieved successfully.");
   }
 
@@ -90,6 +99,9 @@ public class ProductService : IProductService
       return Result.Failure<ProductDto>("Product not found.");
 
     var productDto = _mapper.Map<ProductDto>(product);
+    var images = await _productRepository.GetProductImagesAsync(id);
+    productDto.ImageUrls = images.Select(i => i.ImageUrl).ToList();
+
     return Result.Success(productDto, "Product retrieved successfully.");
   }
 
@@ -99,12 +111,18 @@ public class ProductService : IProductService
       return Result.Failure<PagedResult<ProductDto>>("Invalid category ID.");
 
     var products = await _productRepository.GetByCategoryIdAsync(categoryId, pageIndex, pageSize);
-    var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
-
     var totalCount = await _productRepository.CountByCategoryAsync(categoryId);
 
-    var pagedResult = PagedResult<ProductDto>.Create(productDtos, totalCount, pageIndex, pageSize);
+    var productDtos = new List<ProductDto>();
+    foreach (var product in products)
+    {
+      var productDto = _mapper.Map<ProductDto>(product);
+      var images = await _productRepository.GetProductImagesAsync(product.Id);
+      productDto.ImageUrls = images.Select(i => i.ImageUrl).ToList();
+      productDtos.Add(productDto);
+    }
 
+    var pagedResult = PagedResult<ProductDto>.Create(productDtos, totalCount, pageIndex, pageSize);
     return Result.Success(pagedResult, "Products by category retrieved successfully.");
   }
 
@@ -114,7 +132,6 @@ public class ProductService : IProductService
       return Result.Failure("Product cannot be null.");
 
     var product = _mapper.Map<Product>(productDto);
-
     var exists = await _productRepository.ExistsAsync(product.Name);
     if (!exists)
       return Result.Failure("Product not found.");
@@ -136,13 +153,10 @@ public class ProductService : IProductService
       return Result.Failure("Product not found.");
 
     product.IsFeatured = isFeatured;
-
     var affectedRows = await _productRepository.UpdateAsync(product);
     if (affectedRows == 0)
       return Result.Failure("Failed to update product.");
 
     return Result.Success("Product updated successfully.");
   }
-
 }
-

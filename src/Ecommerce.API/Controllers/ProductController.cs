@@ -1,7 +1,7 @@
 using AutoMapper;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Shared.Common;
-using Ecommerce.Shared.ViewModels;
+using Ecommerce.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;
@@ -19,6 +19,19 @@ public class ProductController : ControllerBase
     _mapper = mapper;
   }
 
+  [HttpGet]
+  public async Task<IActionResult> GetAllProducts([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+  {
+    var result = await _productService.GetAllProductsAsync(pageIndex, pageSize);
+
+    if (!result.IsSuccess)
+      return BadRequest(ApiResponse<string>.Fail(result.Message));
+
+    var paged = _mapper.Map<PagedResult<ProductDto>>(result.Data);
+
+    return Ok(ApiResponse<PagedResult<ProductDto>>.Success(paged, result.Message));
+  }
+
   [HttpGet("featured")]
   public async Task<IActionResult> GetFeaturedProducts([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
   {
@@ -27,10 +40,9 @@ public class ProductController : ControllerBase
     if (!result.IsSuccess)
       return BadRequest(ApiResponse<string>.Fail(result.Message));
 
+    var paged = _mapper.Map<PagedResult<ProductDto>>(result.Data);
 
-    var paged = _mapper.Map<PagedResult<ProductViewModel>>(result.Data);
-
-    return Ok(ApiResponse<PagedResult<ProductViewModel>>.Success(paged, result.Message));
+    return Ok(ApiResponse<PagedResult<ProductDto>>.Success(paged, result.Message));
   }
 
   [HttpGet("category/{categoryId}")]
@@ -41,9 +53,9 @@ public class ProductController : ControllerBase
     if (!result.IsSuccess)
       return BadRequest(ApiResponse<string>.Fail(result.Message));
 
-    var paged = _mapper.Map<PagedResult<ProductViewModel>>(result.Data);
+    var paged = _mapper.Map<PagedResult<ProductDto>>(result.Data);
 
-    return Ok(ApiResponse<PagedResult<ProductViewModel>>.Success(paged, result.Message));
+    return Ok(ApiResponse<PagedResult<ProductDto>>.Success(paged, result.Message));
   }
 
   [HttpGet("{id}")]
@@ -54,7 +66,7 @@ public class ProductController : ControllerBase
     if (!result.IsSuccess)
       return NotFound(ApiResponse<string>.Fail(result.Message));
 
-    var viewModel = _mapper.Map<ProductViewModel>(result.Data);
-    return Ok(ApiResponse<ProductViewModel>.Success(viewModel, result.Message));
+    var dto = _mapper.Map<ProductDto>(result.Data);
+    return Ok(ApiResponse<ProductDto>.Success(dto, result.Message));
   }
 }

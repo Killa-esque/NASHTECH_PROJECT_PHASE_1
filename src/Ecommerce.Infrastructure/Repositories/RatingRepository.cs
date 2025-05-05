@@ -15,13 +15,26 @@ public class RatingRepository : IRatingRepository
   }
   public async Task<IEnumerable<Rating>> GetRatingsByProductIdAsync(Guid productId, int pageIndex = 1, int pageSize = 10)
   {
-    return await _context.Ratings
-      .AsNoTracking()
-      .Where(r => r.ProductId == productId)
-      .Skip((pageIndex - 1) * pageSize)
-      .Take(pageSize)
-      .ToListAsync()
-      .ConfigureAwait(false);
+    var query = from rating in _context.Ratings
+                join user in _context.Users on rating.UserId equals user.Id
+                where rating.ProductId == productId
+                select new Rating
+                {
+                  Id = rating.Id,
+                  ProductId = rating.ProductId,
+                  UserId = rating.UserId,
+                  RatingValue = rating.RatingValue,
+                  Comment = rating.Comment,
+                  CreatedDate = rating.CreatedDate,
+                  // Since Rating entity doesn't have UserName, we'll handle it in the service layer
+                };
+
+    return await query
+        .AsNoTracking()
+        .Skip((pageIndex - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync()
+        .ConfigureAwait(false);
   }
 
   public async Task AddAsync(Rating rating)
@@ -33,4 +46,23 @@ public class RatingRepository : IRatingRepository
   {
     await _context.SaveChangesAsync();
   }
+
+  public async Task<string> GetUserNameByIdAsync(string userId)
+  {
+    var user = await _context.Users
+        .AsNoTracking()
+        .FirstOrDefaultAsync(u => u.Id == userId)
+        .ConfigureAwait(false);
+
+    return user?.UserName ?? "Unknown User";
+  }
+
+  public async Task<int> CountRatingsByProductIdAsync(Guid productId)
+  {
+    return await _context.Ratings
+        .AsNoTracking()
+        .CountAsync(r => r.ProductId == productId)
+        .ConfigureAwait(false);
+  }
+
 }

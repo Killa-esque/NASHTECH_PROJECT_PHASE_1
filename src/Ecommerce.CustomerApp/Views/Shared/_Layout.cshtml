@@ -29,6 +29,8 @@
     </main>
   </div>
 
+  <div id="toast-container" class="toast toast-top toast-end fixed z-50 p-4 space-y-2"></div>
+
   <!-- Footer -->
   @await Html.PartialAsync("_Footer")
 
@@ -38,6 +40,10 @@
   @RenderSection("Scripts", required: false)
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartIcon();
+    });
+
     var swiper = new Swiper(".mySwiper", {
       slidesPerView: 3,
       spaceBetween: 30,
@@ -47,7 +53,69 @@
         clickable: true,
       },
     });
+
+    function showToast(message, type = 'success') {
+      const colors = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-600 text-white',
+        info: 'bg-blue-500 text-white',
+        warning: 'bg-yellow-400 text-black'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `alert ${colors[type]} shadow-lg`;
+      toast.innerHTML = `
+      <span>${message}</span>
+    `;
+
+      const container = document.getElementById('toast-container');
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    async function updateCartIcon() {
+      try {
+        const response = await fetch('/Cart/GetCartSummary', {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        const result = await response.json();
+
+        console.log(result);
+        if (result.success) {
+          // Cập nhật số lượng sản phẩm
+          document.getElementById('cartCounter').innerText = result.totalItems;
+
+          // Cập nhật danh sách sản phẩm trong dropdown
+          const miniCartItems = document.getElementById('miniCartItems');
+          const cartSummary = document.getElementById('cartSummary');
+          miniCartItems.innerHTML = ''; // Xóa nội dung cũ
+          cartSummary.innerText = `${result.totalItems} sản phẩm`;
+
+          result.items.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'py-2 flex justify-between items-center';
+            itemElement.innerHTML = `
+          <span class="text-sm text-yellow-900 dark:text-yellow-300">${item.productName}</span>
+          <span class="text-sm text-gray-500 dark:text-gray-400">x${item.quantity}</span>
+        `;
+            miniCartItems.appendChild(itemElement);
+          });
+        } else {
+          console.error('Failed to fetch cart summary:', result.message);
+        }
+      } catch (error) {
+        console.error('Error updating cart icon:', error);
+      }
+    }
   </script>
+  
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 using AutoMapper;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Repositories;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Domain.Entities;
@@ -10,13 +10,11 @@ namespace Ecommerce.Application.Services;
 public class CategoryService : ICategoryService
 {
   private readonly ICategoryRepository _categoryRepository;
-  private readonly IProductRepository _productRepository;
   private readonly IMapper _mapper;
 
-  public CategoryService(ICategoryRepository categoryRepository, IProductRepository productRepository, IMapper mapper)
+  public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
   {
     _categoryRepository = categoryRepository;
-    _productRepository = productRepository;
     _mapper = mapper;
   }
   public async Task<Result<PagedResult<CategoryDto>>> GetAllCategoriesAsync(int pageIndex, int pageSize)

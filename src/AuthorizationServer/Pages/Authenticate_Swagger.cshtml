@@ -1,0 +1,34 @@
+@page
+@model OAuth.OpenIddict.AuthorizationServer.Pages.Authenticate_SwaggerModel
+
+@*Please do not forget to add tag helper*@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+  ViewData["Title"] = "Authenticate Swagger";
+}
+
+<h2>Authenticate Swagger</h2>
+
+@if (!ModelState.IsValid)
+{
+  <div class="error">
+    @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+    {
+      <p>@error.ErrorMessage</p>
+    }
+  </div>
+}
+<div>Return URL: @Model.ReturnUrl</div>
+
+<form method="post" autocomplete="off">
+  <div>
+    <label for="email">Email:</label>
+    <input id="email" name="Input.Email" value="@Model.Input.Email" />
+  </div>
+  <div>
+    <label for="password">Password:</label>
+    <input id="password" name="Input.Password" type="password" value="" />
+  </div>
+  <button type="submit">Login</button>
+</form>

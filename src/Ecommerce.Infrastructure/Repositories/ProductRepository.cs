@@ -25,7 +25,6 @@ public class ProductRepository : IProductRepository
         .ConfigureAwait(false);
   }
 
-
   public async Task<IEnumerable<Product>> GetAllAsync(int pageIndex, int pageSize)
   {
     return await _context.Products
@@ -49,6 +48,20 @@ public class ProductRepository : IProductRepository
       .ConfigureAwait(false);
   }
 
+  public async Task<IEnumerable<Product>> GetByIdsAsync(List<Guid> ids)
+  {
+    if (ids == null || !ids.Any())
+    {
+      throw new ArgumentException("Product IDs cannot be null or empty.", nameof(ids));
+    }
+
+    return await _context.Products
+      .AsNoTracking()
+      .Where(p => ids.Contains(p.Id))
+      .ToListAsync()
+      .ConfigureAwait(false);
+  }
+
   public async Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid categoryId, int pageIndex, int pageSize)
   {
     return await _context.Products
@@ -56,6 +69,21 @@ public class ProductRepository : IProductRepository
       .Where(p => p.CategoryId == categoryId)
       .Skip((pageIndex - 1) * pageSize)
       .Take(pageSize)
+      .ToListAsync()
+      .ConfigureAwait(false);
+  }
+
+  public async Task<IEnumerable<ProductImage>> GetProductImagesAsync(Guid productId)
+  {
+    if (productId == Guid.Empty)
+    {
+      throw new ArgumentException("Product ID cannot be empty.", nameof(productId));
+    }
+
+    return await _context.ProductImages
+      .AsNoTracking()
+      .Where(pi => pi.ProductId == productId)
+      .OrderByDescending(pi => pi.IsPrimary)
       .ToListAsync()
       .ConfigureAwait(false);
   }

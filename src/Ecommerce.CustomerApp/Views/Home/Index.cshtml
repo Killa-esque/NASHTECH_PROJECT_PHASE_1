@@ -1,64 +1,123 @@
+@using Ecommerce.Shared.ViewModels
 @{
-  ViewData["Title"] = "Trang chủ";
-  var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    ViewData["Title"] = "Trang chủ";
+    var featuredProducts = Model as List<ProductViewModel>;
+    var categories = ViewBag.Categories as List<CategoryViewModel>;
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var hasError = !string.IsNullOrEmpty(ViewBag.Error);
 }
 
 <!-- Carousel -->
 @await Html.PartialAsync("_Carousel")
 
 <!-- Hero Section -->
-<section class="bg-amber-50 dark:bg-gray-800 py-20">
-  <div class="max-w-6xl mx-auto px-6 text-center">
-    <h1 class="text-4xl font-extrabold text-yellow-900 dark:text-yellow-300 mb-4">
-      Vị ngọt lan tỏa từ những chiếc bánh thủ công 🍞
-    </h1>
-    <p class="text-lg text-amber-800 dark:text-gray-300 mb-6">
-      Chào mừng bạn đến với tiệm bánh của chúng tôi — nơi hương vị và cảm xúc hội tụ!
-    </p>
-    <a href="/products"
-      class="inline-block bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition">
-      Khám phá menu
-    </a>
-  </div>
+<section class="bg-amber-50 dark:bg-gray-800 py-10">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+        <h1 class="text-4xl font-extrabold text-yellow-900 dark:text-yellow-300 mb-4">
+            Vị ngọt lan tỏa từ những chiếc bánh thủ công 🍞
+        </h1>
+        <p class="text-lg text-amber-800 dark:text-gray-300 mb-6">
+            Chào mừng bạn đến với tiệm bánh của chúng tôi — nơi hương vị và cảm xúc hội tụ!
+        </p>
+        <a href="/Product"
+            class="inline-block bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition">
+            Khám phá menu
+        </a>
+        <p class="italic text-sm text-gray-500 dark:text-gray-400 mt-4 max-w-md mx-auto">
+            “Chiếc bánh Chocolate mình đặt hôm sinh nhật là ngon nhất từ trước đến nay!” — một khách hàng thân thiết
+        </p>
+
+    </div>
 </section>
 
 <!-- Divider -->
 <div class="my-12 border-t border-amber-400 dark:border-gray-700 w-1/2 mx-auto"></div>
 
-<!-- Sản phẩm nổi bật -->
-<section class="bg-white dark:bg-gray-800 py-20">
-  <div class="max-w-7xl mx-auto px-6">
+<!-- Featured Products -->
+<section id="featured-products" class="bg-amber-50 dark:bg-gray-800 py-10">
+    <div class="container mx-auto px-6">
+        <!-- Section Header -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-yellow-900 dark:text-yellow-300 mb-3">
+                Bánh nổi bật trong tuần 🥐
+            </h2>
+            <p class="text-lg text-yellow-800 dark:text-yellow-300 max-w-xl mx-auto">
+                Từng chiếc bánh là một câu chuyện ngọt ngào, được chọn lọc bởi khách hàng thân thiết!
+            </p>
+        </div>
 
-    <!-- Tiêu đề -->
-    <div class="text-center mb-12">
-      <h2 class="text-4xl font-bold tracking-tight text-yellow-900 dark:text-yellow-300 mb-4">
-        Bánh nổi bật trong tuần 🥐
-      </h2>
-      <p class="text-lg text-yellow-800 dark:text-yellow-300 max-w-xl mx-auto">
-        Từng chiếc bánh là một câu chuyện nhỏ ngọt ngào, được chọn lọc bởi khách hàng thân thiết!
-      </p>
-    </div>
+        <!-- Error/Empty State -->
+        @if (hasError)
+        {
+            <div class="alert alert-error mb-6 justify-center">
+                <span>@ViewBag.Error</span>
+            </div>
+        }
+        else if (!(featuredProducts?.Any() == true))
+        {
+            <div class="alert alert-info mb-6 justify-center">
+                <span>Hiện tại chưa có sản phẩm nổi bật nào.</span>
+            </div>
+        }
+        else
+        {
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+                @foreach (var product in featuredProducts)
+                {
+                    @await Html.PartialAsync("_ProductCard", product)
+                }
+            </div>
 
-    <!-- Lưới sản phẩm -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-      @for (int i = 0; i < 4; i++)
-      {
-        @await Html.PartialAsync("_ProductCard", new {
-        Id = i + 1,
-            Name = $"Bánh Tart Táo {i + 1}",
-            Price = 135000 + i * 10000,
-            ImageUrl = "/img/mini-cake.jpg"
-            })
+            <!-- Pagination -->
+            @if (totalPages > 1)
+            {
+                <div class="flex justify-center mt-12">
+                    <div class="join">
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            var isActive = i == currentPage;
+                            <a href="/?page=@i#featured-products"
+                                class="join-item btn btn-sm @(isActive
+                                                                                                    ? "bg-yellow-800 text-white dark:bg-yellow-600"
+                                                                                                    : "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-gray-700 dark:text-yellow-300 dark:hover:bg-gray-600")">
+                    @i
+                </a>
+                                }
+                    </div>
+                </div>
             }
+        }
     </div>
-
-    <!-- CTA -->
-    <div class="text-center mt-14">
-      <a href="/products"
-        class="inline-block bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg text-sm font-medium transition">
-        Xem thêm bánh ngọt 🍰
-      </a>
-    </div>
-
-  </div>
 </section>
+
+
+@section Scripts {
+    <script>
+        async function addToCart(productId, quantity) {
+            try {
+                const response = await fetch('/Cart/AddToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ productId, quantity })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast(`Đã thêm sản phẩm vào giỏ hàng! : Tổng số lượng: ${result.totalItems}`, 'success');
+                    // Cập nhật giao diện giỏ hàng nếu cần
+                    updateCartIcon();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng', 'error');
+            }
+        }
+    </script>
+}

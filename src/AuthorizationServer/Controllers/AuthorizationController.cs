@@ -54,6 +54,7 @@ public class AuthorizationController : Controller
     {
       "admin_client" => "AdminScheme",
       "customer_client" => "CustomerScheme",
+      "swagger_client" => "SwaggerScheme",
       _ => IdentityConstants.ApplicationScheme
     };
 
@@ -125,6 +126,17 @@ public class AuthorizationController : Controller
     else if (clientId == "customer_client" && !roles.Contains("customer"))
     {
       Console.WriteLine($"[AUTH] Authorize: User {userId} lacks 'customer' role for customer_client");
+      return Forbid(
+          authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+          properties: new AuthenticationProperties(new Dictionary<string, string?>
+          {
+            [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.AccessDenied,
+            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "User lacks required role."
+          }));
+    }
+    else if (clientId == "swagger_client" && !roles.Contains("customer"))
+    {
+      Console.WriteLine($"[AUTH] Authorize: User {userId} lacks 'customer' role for swagger_client");
       return Forbid(
           authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
           properties: new AuthenticationProperties(new Dictionary<string, string?>

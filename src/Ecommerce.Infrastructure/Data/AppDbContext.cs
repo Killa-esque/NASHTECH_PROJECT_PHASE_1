@@ -19,6 +19,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
     public DbSet<DiscountCode> DiscountCodes { get; set; }
     public DbSet<Rating> Ratings { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -140,6 +142,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ProductImage -> Product
+        modelBuilder.Entity<ProductImage>()
+            .HasKey(pi => pi.Id);
+        modelBuilder.Entity<ProductImage>()
+            .HasOne<Product>()
+            .WithMany()
+            .HasForeignKey(pi => pi.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

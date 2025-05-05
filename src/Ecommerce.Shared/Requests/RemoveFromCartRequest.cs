@@ -1,4 +1,4 @@
-namespace Ecommerce.API.Requests;
+namespace Ecommerce.Shared.Requests;
 
 public class RemoveFromCartRequest
 {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.CustomerApp.Controllers;
 
-public class AccountController : Controller
+public class AuthController : Controller
 {
   [HttpGet("/login")]
   public IActionResult Login(string returnUrl = "/")
