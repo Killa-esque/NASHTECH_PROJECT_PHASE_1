@@ -1,0 +1,15 @@
+@model dynamic
+
+<section class="bg-amber-50 dark:bg-gray-800 py-20">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-4">
+      Sản phẩm không tìm thấy
+    </h1>
+    <p class="text-lg text-amber-800 dark:text-yellow-300 mb-6">
+      @Model.Message
+    </p>
+    <a href="/Product" class="btn bg-yellow-800 hover:bg-yellow-700 text-white transition">
+      Quay lại danh sách sản phẩm
+    </a>
+  </div>
+</section>

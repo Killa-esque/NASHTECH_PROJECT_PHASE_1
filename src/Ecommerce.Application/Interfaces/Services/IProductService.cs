@@ -1,6 +1,5 @@
 using Ecommerce.Shared.Common;
-using Ecommerce.Application.DTOs;
-using Ecommerce.Shared.Common;
+using Ecommerce.Shared.DTOs;
 
 namespace Ecommerce.Application.Interfaces.Services;
 

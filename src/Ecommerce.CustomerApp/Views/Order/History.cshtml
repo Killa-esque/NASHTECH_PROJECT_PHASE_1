@@ -1,89 +1,106 @@
+@using Ecommerce.Shared.ViewModels
+@using Ecommerce.Shared.Common
+@model PagedResult<OrderViewModel>
 <section class="bg-white dark:bg-gray-900 py-20 px-6">
   <div class="max-w-5xl mx-auto">
     <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-10 text-center">
       🧾 Lịch sử đơn hàng của bạn
     </h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Đơn hàng 1 -->
-      <div class="card bg-amber-50 dark:bg-gray-800 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-between items-start">
-            <h2 class="card-title text-yellow-900 dark:text-yellow-200">
-              Đơn hàng #SB4251
-            </h2>
-            <span class="badge bg-green-600 text-white">Đã thanh toán</span>
-          </div>
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+      <p class="text-center text-yellow-800 dark:text-yellow-100">Bạn chưa có đơn hàng nào.</p>
+    }
+    else
+    {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        @foreach (var order in Model.Items)
+        {
+          <div
+            class="card @(order.Status == "Cancelled" ? "bg-gray-200 dark:bg-gray-700" : "bg-amber-50 dark:bg-gray-800") shadow-md">
+            <div class="card-body">
+              <div class="flex justify-between items-start">
+                <h2
+                  class="card-title @(order.Status == "Cancelled" ? "text-gray-800 dark:text-gray-200" : "text-yellow-900 dark:text-yellow-200")">
+                  Đơn hàng #@order.OrderCode
+                </h2>
+                <span
+                  class="badge @(order.Status == "Paid" ? "bg-green-600" : order.Status == "Pending" ? "bg-yellow-500" : "bg-gray-500") text-white">@order.Status</span>
+              </div>
 
-          <p class="text-sm text-yellow-800 dark:text-yellow-100">
-            Ngày đặt: 25/04/2025 - Giao lúc 11:00<br />
-            Tổng cộng: <strong>430.000 ₫</strong><br />
-            Phương thức: <strong>Momo</strong>
-          </p>
+              <p
+                class="text-sm @(order.Status == "Cancelled" ? "text-gray-700 dark:text-gray-200" : "text-yellow-800 dark:text-yellow-100")">
+                Ngày đặt: @order.CreatedDate.ToString("dd/MM/yyyy HH:mm")<br />
+                Tổng cộng: <strong>@order.TotalAmount.ToString("N0") ₫</strong><br />
+                Phương thức: <strong>@order.PaymentMethod</strong>
+              </p>
 
-          <div class="text-sm text-yellow-800 dark:text-yellow-100">
-            📍 Giao tới: <em>123 Đường ABC, Q.1, TP.HCM</em>
-          </div>
+              <div
+                class="text-sm @(order.Status == "Cancelled" ? "text-gray-700 dark:text-gray-200" : "text-yellow-800 dark:text-yellow-100")">
+                📍 Giao tới: <em>@order.ShippingAddress</em>
+              </div>
 
-          <div class="card-actions justify-end mt-4">
-            <a href="/Order/Detail/4251" class="btn btn-sm bg-yellow-800 text-white">Xem chi tiết</a>
+              <div class="card-actions justify-between mt-4">
+                <a href="/Order/Detail/@order.Id"
+                  class="btn btn-sm @(order.Status == "Cancelled" ? "btn-outline" : "bg-yellow-800 text-white")">Xem chi
+                  tiết</a>
+                @if (order.Status == "Pending")
+                {
+                  <button data-order-id="@order.Id"
+                    class="btn btn-sm bg-red-600 text-white">Hủy đơn</button>
+                }
+              </div>
+            </div>
           </div>
-        </div>
+        }
       </div>
 
-      <!-- Đơn hàng 2 -->
-      <div class="card bg-amber-50 dark:bg-gray-800 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-between items-start">
-            <h2 class="card-title text-yellow-900 dark:text-yellow-200">
-              Đơn hàng #SB4248
-            </h2>
-            <span class="badge bg-yellow-500 text-white">Chờ thanh toán</span>
-          </div>
-
-          <p class="text-sm text-yellow-800 dark:text-yellow-100">
-            Ngày đặt: 21/04/2025 - Giao lúc 15:00<br />
-            Tổng cộng: <strong>280.000 ₫</strong><br />
-            Phương thức: <strong>Chuyển khoản</strong>
-          </p>
-
-          <div class="text-sm text-yellow-800 dark:text-yellow-100">
-            📍 Giao tới: <em>456 Đường DEF, Q.3, TP.HCM</em>
-          </div>
-
-          <div class="card-actions justify-between mt-4">
-            <a href="/Order/Detail/4248" class="btn btn-sm btn-outline text-yellow-900 dark:text-yellow-200">Xem chi
-              tiết</a>
-            <a href="/Payment/QR?orderId=SB4248" class="btn btn-sm bg-yellow-700 text-white">Thanh toán ngay</a>
-          </div>
+      <div class="mt-8 flex justify-center">
+        <div class="join">
+          <a href="/Order/History?pageIndex=@(Model.PageIndex - 1)&pageSize=@Model.PageSize"
+            class="join-item btn btn-outline @(Model.PageIndex <= 1 ? "btn-disabled" : "")">«</a>
+          <button class="join-item btn btn-outline">Trang @Model.PageIndex</button>
+          <a href="/Order/History?pageIndex=@(Model.PageIndex + 1)&pageSize=@Model.PageSize"
+            class="join-item btn btn-outline @(Model.PageIndex >= Model.TotalPages ? "btn-disabled" : "")">»</a>
         </div>
       </div>
-
-      <!-- Đơn hàng 3 -->
-      <div class="card bg-gray-200 dark:bg-gray-700 shadow-md">
-        <div class="card-body">
-          <div class="flex justify-between items-start">
-            <h2 class="card-title text-gray-800 dark:text-gray-200">
-              Đơn hàng #SB4237
-            </h2>
-            <span class="badge bg-gray-500 text-white">Đã huỷ</span>
-          </div>
-
-          <p class="text-sm text-gray-700 dark:text-gray-200">
-            Ngày đặt: 15/04/2025<br />
-            Tổng cộng: <strong>--</strong><br />
-            Phương thức: <strong>--</strong>
-          </p>
-
-          <div class="text-sm text-gray-700 dark:text-gray-200">
-            📍 Giao tới: <em>789 Đường XYZ, Q.5, TP.HCM</em>
-          </div>
-
-          <div class="card-actions justify-end mt-4">
-            <a href="/Order/Detail/4237" class="btn btn-sm btn-outline">Xem chi tiết</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </section>
+
+@section Scripts {
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('.cancel-order').on('click', function () {
+        const orderId = $(this).data('order-id');
+        if (!orderId) {
+          showToast('ID đơn hàng không hợp lệ.', 'error');
+          return;
+        }
+
+        if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+          $.ajax({
+            url: '/Order/Cancel',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ orderId: orderId }),
+            success: function (response) {
+              console.log('CancelOrder response:', JSON.stringify(response, null, 2));
+              if (response.status) {
+                showToast(response.message, 'success');
+                location.reload(); // Tải lại trang để cập nhật danh sách
+              } else {
+                showToast('Lỗi: ' + response.message, 'error');
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error('CancelOrder error:', xhr, status, error);
+              showToast('Không thể hủy đơn hàng: ' + error, 'error');
+            }
+          });
+        }
+      });
+    });
+  </script>
+}

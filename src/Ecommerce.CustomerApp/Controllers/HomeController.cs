@@ -1,25 +1,29 @@
-using Microsoft.AspNetCore.Authentication;
+using Ecommerce.CustomerApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+
+namespace Ecommerce.CustomerApp.Controllers;
 
 public class HomeController : Controller
 {
   private readonly ICategoryService _categoryService;
+  private readonly IProductService _productService;
 
-  public HomeController(ICategoryService categoryService)
+  public HomeController(ICategoryService categoryService, IProductService productService)
   {
     _categoryService = categoryService;
+    _productService = productService;
   }
 
-  public async Task<IActionResult> Index()
+  public async Task<IActionResult> Index(int page = 1)
   {
-    // var accessToken = await HttpContext.GetTokenAsync("access_token");
-    // var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
-    // var idToken = await HttpContext.GetTokenAsync("id_token");
-    // var expiresAt = await HttpContext.GetTokenAsync("expires_at");
-    // var categories = await _categoryService.GetCategoriesForMenuAsync(1, 10);
+    var categories = await _categoryService.GetCategoriesForMenuAsync(1, 10);
+    var featuredProductsPaged = await _productService.GetFeaturedProductsAsync(page, 8);
 
-    // Console.WriteLine(categories.Count);
+    ViewBag.Categories = categories;
+    ViewBag.CurrentPage = featuredProductsPaged.PageIndex;
+    ViewBag.TotalPages = (int)Math.Ceiling((double)featuredProductsPaged.TotalCount / featuredProductsPaged.PageSize);
 
-    return View();
+    return View(featuredProductsPaged.Items);
   }
+
 }

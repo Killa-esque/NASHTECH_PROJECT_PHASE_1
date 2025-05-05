@@ -1,136 +1,9 @@
-@* <section class="bg-white dark:bg-gray-800 py-20">
-  <div class="max-w-5xl mx-auto px-6">
-    <!-- Tiêu đề -->
-    <div class="text-center mb-12">
-      <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-2">
-        🧾 Đặt bánh của bạn
-      </h1>
-      <p class="text-yellow-800 dark:text-yellow-300">Điền thông tin và xác nhận đơn hàng bên dưới nhé!</p>
-    </div>
+@using Ecommerce.Shared.ViewModels
+@using System.Text.Json
+@model OrderViewModel
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-      <!-- Form khách hàng -->
-      <div class="space-y-6">
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text text-yellow-800 dark:text-yellow-300">Họ và tên</span>
-          </label>
-          <input type="text" placeholder="Nguyễn Văn A"
-            class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text text-yellow-800 dark:text-yellow-300">Số điện thoại</span>
-          </label>
-          <input type="text" placeholder="0123 456 789"
-            class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text text-yellow-800 dark:text-yellow-300">Email (nhận xác nhận đơn)</span>
-          </label>
-          <input type="email" placeholder="you@example.com"
-            class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text text-yellow-800 dark:text-yellow-300">Địa chỉ giao hàng</span>
-          </label>
-          <textarea class="textarea textarea-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
-            rows="3" placeholder="123 đường ABC, Quận 1, TP.HCM"></textarea>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text text-yellow-800 dark:text-yellow-300">Ngày giao</span>
-            </label>
-            <input type="date"
-              class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-          </div>
-
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text text-yellow-800 dark:text-yellow-300">Giờ giao</span>
-            </label>
-            <input type="time"
-              class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-          </div>
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text text-yellow-800 dark:text-yellow-300">Ghi chú thêm</span>
-          </label>
-          <textarea class="textarea textarea-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
-            rows="2" placeholder="Không cay, bánh cho trẻ em, tặng người yêu..."></textarea>
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text text-yellow-800 dark:text-yellow-300">Phương thức thanh toán</span>
-          </label>
-          <select class="select select-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100">
-            <option>Tiền mặt khi nhận hàng</option>
-            <option>Chuyển khoản ngân hàng</option>
-            <option>Ví điện tử (Momo/ZaloPay)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Tóm tắt đơn hàng -->
-      <div class="bg-amber-50 dark:bg-gray-700 rounded-xl p-6 space-y-4 shadow">
-        <h2 class="text-xl font-semibold text-yellow-900 dark:text-yellow-100">🧁 Đơn hàng của bạn</h2>
-
-        <div class="space-y-3">
-          <div class="flex justify-between text-yellow-800 dark:text-yellow-200">
-            <span>Bánh Tart Dâu x 2</span>
-            <span>290.000 ₫</span>
-          </div>
-          <div class="flex justify-between text-yellow-800 dark:text-yellow-200">
-            <span>Bánh Socola Nhân Kem x 1</span>
-            <span>120.000 ₫</span>
-          </div>
-        </div>
-
-        <div class="divider my-2"></div>
-
-        <div class="flex justify-between text-yellow-800 dark:text-yellow-200">
-          <span>Phí giao hàng</span>
-          <span>20.000 ₫</span>
-        </div>
-
-        <div class="flex justify-between font-semibold text-yellow-900 dark:text-yellow-100 text-lg">
-          <span>Tổng cộng</span>
-          <span>430.000 ₫</span>
-        </div>
-
-        <div class="form-control">
-          <label class="cursor-pointer label justify-start gap-2">
-            <input type="checkbox" class="checkbox checkbox-warning" />
-            <span class="label-text text-yellow-900 dark:text-yellow-100">Tôi đồng ý với <a href="#"
-                class="underline">chính sách đặt hàng</a></span>
-          </label>
-        </div>
-
-
-        <form asp-controller="Order" asp-action="Submit" method="post">
-          <button type="submit"
-            class="btn w-full mt-4 bg-yellow-800 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-white">
-            ✅ Đặt bánh ngay
-          </button>
-        </form>
-
-      </div>
-    </div>
-  </div>
-</section> *@
 <section class="bg-white dark:bg-gray-800 py-20">
   <div class="max-w-5xl mx-auto px-6">
-    <!-- Tiêu đề -->
     <div class="text-center mb-12">
       <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-2">
         🧾 Đặt bánh của bạn
@@ -140,92 +13,67 @@
 
     <form id="order-form" asp-controller="Order" asp-action="Submit" method="post">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <!-- Form khách hàng -->
+        <!-- Thông tin giao hàng -->
         <div class="space-y-6">
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text text-yellow-800 dark:text-yellow-300">Họ và tên</span>
-            </label>
-            <input type="text" placeholder="Nguyễn Văn A"
-              class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-          </div>
-
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text text-yellow-800 dark:text-yellow-300">Số điện thoại</span>
-            </label>
-            <input type="text" placeholder="0123 456 789"
-              class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-          </div>
-
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text text-yellow-800 dark:text-yellow-300">Email (nhận xác nhận đơn)</span>
-            </label>
-            <input type="email" placeholder="you@example.com"
-              class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-          </div>
-
           <div class="form-control">
             <label class="label">
               <span class="label-text text-yellow-800 dark:text-yellow-300">Địa chỉ giao hàng</span>
             </label>
-            <textarea
+            <textarea id="shippingAddress" name="ShippingAddress"
               class="textarea textarea-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
-              rows="3" placeholder="123 đường ABC, Quận 1, TP.HCM"></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text text-yellow-800 dark:text-yellow-300">Ngày giao</span>
-              </label>
-              <input type="date"
-                class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-            </div>
-
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text text-yellow-800 dark:text-yellow-300">Giờ giao</span>
-              </label>
-              <input type="time"
-                class="input input-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-            </div>
+              rows="3" placeholder="123 đường ABC, Quận 1, TP.HCM">@Model.ShippingAddress</textarea>
+            <span class="text-red-600 text-sm error" id="shippingAddressError"></span>
           </div>
 
           <div class="form-control">
             <label class="label">
               <span class="label-text text-yellow-800 dark:text-yellow-300">Ghi chú thêm</span>
             </label>
-            <textarea
+            <textarea id="note" name="Note"
               class="textarea textarea-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
-              rows="2" placeholder="Không cay, bánh cho trẻ em, tặng người yêu..."></textarea>
+              rows="2" placeholder="Không cay, bánh cho trẻ em, tặng người yêu...">@Model.Note</textarea>
+            <span class="text-red-600 text-sm error" id="noteError"></span>
           </div>
 
           <div class="form-control">
             <label class="label">
               <span class="label-text text-yellow-800 dark:text-yellow-300">Phương thức thanh toán</span>
             </label>
-            <select id="payment-method" name="paymentMethod"
+            <select id="paymentMethod" name="PaymentMethod"
               class="select select-bordered bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-yellow-100">
-              <option value="cod">Tiền mặt khi nhận hàng</option>
-              <option value="bank">Chuyển khoản ngân hàng</option>
-              <option value="momo">Ví điện tử (Momo)</option>
+              <option value="cod" selected="@(Model.PaymentMethod == "cod")">Tiền mặt khi nhận hàng</option>
+              <option value="bank" selected="@(Model.PaymentMethod == "bank")">Chuyển khoản ngân hàng</option>
+              <option value="momo" selected="@(Model.PaymentMethod == "momo")">Ví điện tử (Momo)</option>
             </select>
+            <span class="text-red-600 text-sm error" id="paymentMethodError"></span>
           </div>
         </div>
 
-        <!-- Tóm tắt đơn hàng -->
+        <!-- Danh sách sản phẩm -->
         <div class="bg-amber-50 dark:bg-gray-700 rounded-xl p-6 space-y-4 shadow">
           <h2 class="text-xl font-semibold text-yellow-900 dark:text-yellow-100">🧁 Đơn hàng của bạn</h2>
-          <!-- ... [chi tiết đơn hàng như trước] -->
+          <div id="order-items" class="space-y-2">
+            @foreach (var item in Model.Items)
+            {
+              <div class="flex justify-between text-yellow-800 dark:text-yellow-100">
+                <span>@item.ProductName x @item.Quantity</span>
+                <span>@((item.Price * item.Quantity).ToString("N0")) $</span>
+              </div>
+            }
+          </div>
+          <div class="flex justify-between font-semibold text-yellow-900 dark:text-yellow-100 text-lg">
+            <span>Tổng cộng</span>
+            <span id="totalAmount">@Model.TotalAmount.ToString("N0") $</span>
+            <input type="hidden" id="totalAmountInput" name="TotalAmount" value="@Model.TotalAmount" />
+          </div>
 
           <div class="form-control">
             <label class="cursor-pointer label justify-start gap-2">
-              <input type="checkbox" class="checkbox checkbox-warning" required />
+              <input type="checkbox" id="agreePolicy" class="checkbox checkbox-warning" required />
               <span class="label-text text-yellow-900 dark:text-yellow-100">Tôi đồng ý với <a href="#"
                   class="underline">chính sách đặt hàng</a></span>
             </label>
+            <span class="text-red-600 text-sm error" id="agreePolicyError"></span>
           </div>
 
           <button type="button" id="confirm-order"
@@ -236,56 +84,129 @@
       </div>
     </form>
 
-    <!-- Modal xác nhận -->
     <dialog id="confirm-modal" class="modal">
       <div class="modal-box bg-white dark:bg-gray-800 text-yellow-900 dark:text-yellow-100">
         <h3 class="font-bold text-lg">Xác nhận đặt bánh</h3>
         <p class="py-2">Bạn chắc chắn muốn đặt đơn bánh này chứ?</p>
         <div class="modal-action">
           <form method="dialog" class="flex gap-2">
-            <button class="btn">❌ Huỷ</button>
-            <button type="submit" id="proceed-submit" class="btn bg-yellow-800 text-white">✅ Xác nhận</button>
+            <button class="btn">❌ Hủy</button>
+            <button type="button" id="proceed-submit" class="btn bg-yellow-800 text-white">✅ Xác nhận</button>
           </form>
         </div>
       </div>
     </dialog>
 
-    <!-- Modal thanh toán QR -->
     <dialog id="qr-modal" class="modal">
       <div class="modal-box bg-white dark:bg-gray-800 text-yellow-900 dark:text-yellow-100">
         <h3 class="font-bold text-lg">🔁 Thanh toán chuyển khoản</h3>
         <p class="py-2">Vui lòng quét mã QR để hoàn tất thanh toán:</p>
         <img src="/img/qr-demo.png" alt="QR Code" class="w-60 h-60 mx-auto rounded-lg shadow" />
-        <p class="text-sm text-center mt-3">Nội dung: <strong>Thanh toán SB4251</strong></p>
+        <p class="text-sm text-center mt-3">Nội dung: <strong id="qr-transaction-id">Thanh toán SBXXXX</strong></p>
         <div class="modal-action justify-center">
           <form method="dialog">
-            <button class="btn btn-sm bg-yellow-800 text-white">Tôi đã thanh toán</button>
+            <button id="qr-completed" class="btn btn-sm bg-yellow-800 text-white">Tôi đã thanh toán</button>
           </form>
         </div>
       </div>
     </dialog>
-
-    <script>
-      const confirmBtn = document.getElementById("confirm-order");
-      const modal = document.getElementById("confirm-modal");
-      const qrModal = document.getElementById("qr-modal");
-      const form = document.getElementById("order-form");
-      const submitBtn = document.getElementById("proceed-submit");
-
-      confirmBtn?.addEventListener("click", () => {
-        modal?.showModal();
-      });
-
-      submitBtn?.addEventListener("click", (e) => {
-        e.preventDefault();
-        const method = document.getElementById("payment-method")?.value;
-        if (method === "cod") {
-          form.submit();
-        } else {
-          modal.close();
-          qrModal?.showModal();
-        }
-      });
-    </script>
   </div>
 </section>
+
+@section Scripts {
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      const confirmBtn = $('#confirm-order');
+      const modal = $('#confirm-modal');
+      const qrModal = $('#qr-modal');
+      const form = $('#order-form');
+      const submitBtn = $('#proceed-submit');
+      const qrCompletedBtn = $('#qr-completed');
+
+      confirmBtn.on('click', function () {
+        if (validateForm()) {
+          modal[0].showModal();
+        }
+      });
+
+      submitBtn.on('click', function (e) {
+        e.preventDefault();
+        const method = $('#paymentMethod').val();
+        if (method === 'bank' || method === 'momo') {
+          modal[0].close();
+          qrModal[0].showModal();
+        } else {
+          submitOrder(method);
+        }
+      });
+
+      qrCompletedBtn.on('click', function () {
+        submitOrder('qr-completed');
+      });
+
+      function validateForm() {
+        $('.error').text('');
+        let isValid = true;
+
+        if (!$('#shippingAddress').val()) {
+          $('#shippingAddressError').text('Địa chỉ giao hàng là bắt buộc.');
+          isValid = false;
+        }
+        if (!$('#paymentMethod').val()) {
+          $('#paymentMethodError').text('Phương thức thanh toán là bắt buộc.');
+          isValid = false;
+        }
+        if (!$('#agreePolicy').is(':checked')) {
+          $('#agreePolicyError').text('Bạn phải đồng ý với chính sách đặt hàng.');
+          isValid = false;
+        }
+
+        if (!isValid) {
+          showToast('Vui lòng kiểm tra lại thông tin.', 'error');
+        }
+        return isValid;
+      }
+
+      function submitOrder(method) {
+        const orderData = {
+          shippingAddress: $('#shippingAddress').val(),
+          paymentMethod: $('#paymentMethod').val(),
+          note: $('#note').val(),
+          totalAmount: parseFloat($('#totalAmountInput').val()),
+          items: @Html.Raw(JsonSerializer.Serialize(Model.Items.Select(i => new { ProductId = i.Id, i.ProductName, i.Quantity, i.Price })))
+            };
+
+        console.log('Sending POST /Order/Submit with data:', JSON.stringify(orderData, null, 2));
+        $.ajax({
+          url: '/Order/Submit',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(orderData),
+          success: function (response) {
+            console.log('SubmitOrder response:', JSON.stringify(response, null, 2));
+            if (response.status) {
+              modal[0].close();
+              qrModal[0].close();
+              $('#qr-transaction-id').text(`Thanh toán ${response.data}`);
+              showToast(response.message, 'success');
+              window.location.href = `/Order/Success?orderId=${response.data}`;
+            } else {
+              showToast('Lỗi: ' + response.message, 'error');
+              if (response.errors) {
+                response.errors.forEach(error => {
+                  if (error.toLowerCase().includes('shippingaddress')) $('#shippingAddressError').text(error);
+                  if (error.toLowerCase().includes('paymentmethod')) $('#paymentMethodError').text(error);
+                });
+              }
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('SubmitOrder error:', xhr, status, error);
+            showToast('Không thể đặt hàng: ' + error, 'error');
+          }
+        });
+      }
+    });
+  </script>
+}

@@ -1,38 +1,54 @@
-using Ecommerce.CustomerApp.Services.ApiClients.Interfaces;
+using Ecommerce.CustomerApp.Services.Interfaces;
 using Ecommerce.Shared.Common;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Shared.ViewModels;
-using System.Net.Http;
-using System.Text.Json;
 
-namespace Ecommerce.CustomerApp.Services.ApiClients;
+namespace Ecommerce.CustomerApp.ApiClients;
+
 public class CategoryApiClient : ICategoryApiClient
 {
   private readonly HttpClient _httpClient;
+  private readonly string _baseUrl;
 
-  public CategoryApiClient(HttpClient httpClient)
+  public CategoryApiClient(HttpClient httpClient, IConfiguration configuration)
   {
     _httpClient = httpClient;
+    _baseUrl = configuration["ApiSettings:BaseUrl"];
   }
 
-  public async Task<List<CategoryViewModel>> GetAllCategoriesAsync(int pageIndex, int pageSize)
+  public async Task<List<CategoryDto>> GetAllCategoriesAsync(int pageIndex, int pageSize)
   {
-    var response = await _httpClient.GetAsync($"/categories?pageIndex={pageIndex}&pageSize={pageSize}");
-    response.EnsureSuccessStatusCode();
+    var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<CategoryViewModel>>>(
+        $"{_baseUrl}/api/categories?pageIndex={pageIndex}&pageSize={pageSize}");
 
-    var content = await response.Content.ReadAsStringAsync();
-    var pagedResult = JsonSerializer.Deserialize<PagedResult<CategoryViewModel>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    if (response?.Status != true || response.Data == null)
+    {
+      throw new Exception(response?.Message ?? "Lỗi khi lấy danh sách danh mục.");
+    }
 
-    return pagedResult?.Items.ToList() ?? new List<CategoryViewModel>();
+    return response.Data.Items.Select(c => new CategoryDto
+    {
+      Id = c.Id,
+      Name = c.Name,
+      Description = c.Description
+    }).ToList();
   }
 
-  public async Task<CategoryViewModel> GetCategoryByIdAsync(Guid id)
+  public async Task<CategoryDto> GetCategoryByIdAsync(Guid categoryId)
   {
-    var response = await _httpClient.GetAsync($"/categories/{id}");
-    response.EnsureSuccessStatusCode();
+    var response = await _httpClient.GetFromJsonAsync<ApiResponse<CategoryViewModel>>(
+        $"{_baseUrl}/api/categories/{categoryId}");
 
-    var content = await response.Content.ReadAsStringAsync();
-    var category = JsonSerializer.Deserialize<CategoryViewModel>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    if (response?.Status != true || response.Data == null)
+    {
+      throw new Exception(response?.Message ?? "Lỗi khi lấy chi tiết danh mục.");
+    }
 
-    return category!;
+    return new CategoryDto
+    {
+      Id = response.Data.Id,
+      Name = response.Data.Name,
+      Description = response.Data.Description
+    };
   }
 }

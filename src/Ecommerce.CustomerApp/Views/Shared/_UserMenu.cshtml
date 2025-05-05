@@ -1,5 +1,8 @@
+@inject Ecommerce.CustomerApp.Services.Interfaces.IUserService UserService
+
 @{
-  var userName = User.Identity?.Name ?? "U";
+  var profileResult = await UserService.GetProfileAsync();
+  var userName = profileResult.Status ? profileResult.Data.FullName : "U";
   var firstLetter = userName.Substring(0, 1).ToUpper();
 }
 
@@ -13,6 +16,11 @@
     <li>
       <a href="/Account/Profile" class="text-yellow-900 dark:text-yellow-300 hover:bg-amber-100 dark:hover:bg-gray-700">
         👤 Hồ sơ
+      </a>
+    </li>
+    <li>
+      <a href="/Order/History" class="text-yellow-900 dark:text-yellow-300 hover:bg-amber-100 dark:hover:bg-gray-700">
+        📦 Lịch sử đơn hàng
       </a>
     </li>
     <li>

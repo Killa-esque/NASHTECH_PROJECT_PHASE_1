@@ -1,11 +1,10 @@
 
 using AutoMapper;
 using Ecommerce.Domain.Entities;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Shared.ViewModels;
 using Ecommerce.Shared.Common;
 using Ecommerce.Infrastructure.Entities;
-using Ecommerce.Application.Common;
 
 public class MappingProfile : Profile
 {
@@ -28,7 +27,11 @@ public class MappingProfile : Profile
     CreateMap<PaymentTransactionDto, PaymentTransaction>().ReverseMap();
     CreateMap<OrderDto, Order>().ReverseMap();
     CreateMap<OrderItemDto, OrderItem>().ReverseMap();
-    CreateMap<CartItemDto, CartItem>().ReverseMap();
+    // CreateMap<CartItemDto, CartItem>().ReverseMap();
+    CreateMap<CartItem, CartItemDto>()
+    .ForMember(dest => dest.ProductName, opt => opt.Ignore()) // Set in CartService
+    .ForMember(dest => dest.Price, opt => opt.Ignore()) // Set in CartService
+    .ForMember(dest => dest.ImageUrl, opt => opt.Ignore()); // Set in CartService
     CreateMap<RatingDto, Rating>().ReverseMap();
     CreateMap<DiscountCodeDto, DiscountCode>().ReverseMap();
     CreateMap<CustomerDto, ApplicationUser>()

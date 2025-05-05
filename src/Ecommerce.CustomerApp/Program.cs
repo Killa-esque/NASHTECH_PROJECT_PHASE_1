@@ -1,10 +1,11 @@
 using Ecommerce.CustomerApp.Services;
 using Ecommerce.CustomerApp.Services.Interfaces;
+using Ecommerce.CustomerApp.Services.ApiClients;
+using Ecommerce.CustomerApp.Services.ApiClients.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Ecommerce.CustomerApp.Services.ApiClients.Interfaces;
-using Ecommerce.CustomerApp.Services.ApiClients;
+using Ecommerce.CustomerApp.ApiClients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,48 +17,57 @@ builder.Services.AddHttpClient("ApiClient", client =>
     client.DefaultRequestHeaders.Add("User-Agent", "Ecommerce.CustomerApp");
 });
 
-builder.Services.AddScoped<ICategoryApiClient, CategoryApiClient>();
-builder.Services.AddScoped<IProductApiClient, ProductApiClient>();
+// Register ApiClients
+builder.Services.AddHttpClient<IUserApiClient, UserApiClient>("ApiClient");
+builder.Services.AddHttpClient<ICategoryApiClient, CategoryApiClient>("ApiClient");
+builder.Services.AddHttpClient<IProductApiClient, ProductApiClient>("ApiClient");
+builder.Services.AddHttpClient<IOrderApiClient, OrderApiClient>("ApiClient");
+builder.Services.AddHttpClient<ICartApiClient, CartApiClient>("ApiClient");
+builder.Services.AddHttpClient<IRatingApiClient, RatingApiClient>("ApiClient");
+builder.Services.AddHttpClient<IUploadApiClient, UploadApiClient>("ApiClient");
 
-builder.Services.AddScoped<IProductService, ProductService>();
+// Register Services
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IUploadService, UploadService>();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddHttpContextAccessor();
 
-// Add Razor Pages
+// Add Controllers with Views
 builder.Services.AddControllersWithViews();
-// builder.Services.AddRazorPages();
 
-// ✅ Configure Authentication
+// Configure Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
     options.Authority = "https://localhost:5000";
-
     options.ClientId = "customer_client";
-    options.ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654";
+    options.ClientSecret = "CustomerSecret123-4567-89AB-CDEF";
     options.ResponseType = "code";
     options.UsePkce = false;
-
     options.SaveTokens = true;
     options.CallbackPath = "/signin-oidc";
     options.SignedOutCallbackPath = "/signout-callback-oidc";
-
     options.Scope.Clear();
     options.Scope.Add("openid");
     options.Scope.Add("profile");
     options.Scope.Add("email");
     options.Scope.Add("roles");
     options.Scope.Add("ecommerce_api");
-    options.Scope.Add("offline_access"); // ✅ đây là tên thật của scope!
-
+    options.Scope.Add("offline_access");
     options.GetClaimsFromUserInfoEndpoint = true;
-
     options.TokenValidationParameters = new TokenValidationParameters
     {
         NameClaimType = "name",
@@ -65,7 +75,6 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidateAudience = false
     };
-
     options.Events = new OpenIdConnectEvents
     {
         OnTokenResponseReceived = ctx =>
@@ -85,18 +94,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
-// app.MapControllers();
-// app.MapRazorPages();
 
 app.MapControllerRoute(
     name: "default",

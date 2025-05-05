@@ -1,13 +1,14 @@
 using AutoMapper;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Shared.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;
+
 [ApiController]
 [Route("api/ratings")]
-// [Authorize] // User phải đăng nhập
+// [Authorize] // User must be logged in
 public class RatingController : ControllerBase
 {
   private readonly IRatingService _ratingService;
@@ -32,9 +33,9 @@ public class RatingController : ControllerBase
   }
 
   [HttpGet("product/{productId}")]
-  public async Task<IActionResult> GetRatingsForProduct(Guid productId)
+  public async Task<IActionResult> GetRatingsForProduct(Guid productId, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
   {
-    var result = await _ratingService.GetRatingsByProductAsync(productId);
+    var result = await _ratingService.GetRatingsByProductAsync(productId, pageIndex, pageSize);
 
     if (result.IsSuccess)
       return Ok(ApiResponse<PagedResult<RatingDto>>.Success(result.Data, result.Message));
@@ -44,6 +45,6 @@ public class RatingController : ControllerBase
 
   private string GetUserId()
   {
-    return "b831506c-d805-4b6b-8682-74892b7f86e7";
+    return "a2ad953e-1482-4cf2-9b94-41c88aeb90e3";
   }
 }

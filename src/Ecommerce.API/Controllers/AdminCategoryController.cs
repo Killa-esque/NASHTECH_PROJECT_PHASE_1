@@ -1,8 +1,7 @@
 using AutoMapper;
 using Ecommerce.Shared.Common;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Services;
-using Ecommerce.Shared.Common; // ✅ Import ApiResponse
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;

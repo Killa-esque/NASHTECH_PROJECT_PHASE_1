@@ -1,19 +1,45 @@
-@model dynamic
+@model Ecommerce.Shared.ViewModels.ProductViewModel
 
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col">
-  <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-48 object-cover rounded-md mb-4">
+@{
+  var image = Model.ImageUrl?.FirstOrDefault() ?? "/img/mini-cake.jpg";
+}
 
-  <h3 class="text-lg font-extrabold text-yellow-900 dark:text-yellow-300 mb-1">
-    @Model.Name
-  </h3>
+<div
+  class="card bg-amber-50 dark:bg-gray-800 shadow hover:shadow-lg transition duration-300 rounded-xl overflow-hidden">
+  <figure class="relative">
+    <img src="@image" alt="@Model.Name" class="w-full h-48 object-cover" />
+    <div class="absolute top-2 right-2 bg-yellow-800 text-white text-xs font-semibold px-2 py-1 rounded">
+      Nổi bật
+    </div>
+  </figure>
 
-  <p class="text-yellow-800 dark:text-yellow-400 text-base">
-    @Model.Price.ToString("N0") ₫
-  </p>
+  <div class="card-body p-4 flex flex-col">
+    <h3 class="text-lg font-bold text-yellow-900 dark:text-yellow-300 line-clamp-2">
+      @Model.Name
+    </h3>
 
-  <button class="mt-auto w-full bg-yellow-800 hover:bg-yellow-700 
-                  dark:bg-yellow-700 dark:hover:bg-yellow-600
-                  text-white py-2 rounded-md text-sm font-medium tracking-wide transition">
-    Thêm vào giỏ 🛒
-  </button>
+    <p class="text-base text-amber-800 dark:text-yellow-200 font-medium mb-2">
+      @Model.Price.ToString("N0") $
+    </p>
+
+    <div class="mt-auto flex flex-col gap-2">
+      @if (Model.Id != Guid.Empty)
+      {
+        <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.Id"
+          class="btn btn-sm bg-yellow-800 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600 text-white w-full transition">
+          Xem chi tiết
+        </a>
+        <button onclick="addToCart('@Model.Id', 1)"
+          class="btn btn-sm bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-gray-700 dark:text-yellow-300 dark:hover:bg-gray-600 w-full transition">
+          Thêm vào giỏ 🛒
+        </button>
+      }
+      else
+      {
+        <button disabled class="btn btn-sm bg-gray-300 text-gray-500 w-full">Không khả dụng</button>
+      }
+    </div>
+  </div>
 </div>
+
+

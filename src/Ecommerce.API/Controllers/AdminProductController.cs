@@ -1,5 +1,5 @@
 using Ecommerce.Shared.Common;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 

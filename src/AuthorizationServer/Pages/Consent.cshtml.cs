@@ -25,6 +25,8 @@ public class ConsentModel : PageModel
   {
     var scheme = ReturnUrl?.Contains("client_id=customer_client") == true
         ? "CustomerScheme"
+        : ReturnUrl?.Contains("client_id=swagger_client") == true
+        ? "SwaggerScheme"
         : "AdminScheme";
 
     var identity = new ClaimsIdentity(User.Claims, scheme);

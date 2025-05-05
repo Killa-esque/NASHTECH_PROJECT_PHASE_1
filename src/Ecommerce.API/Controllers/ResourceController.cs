@@ -5,6 +5,7 @@ namespace OAuth.OpenIddict.ResourceServer.Controllers;
 
 [ApiController]
 [Route("resources")]
+// [Authorize]
 public class ResourceController : Controller
 {
   [Authorize]

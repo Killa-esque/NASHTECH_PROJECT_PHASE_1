@@ -1,108 +1,315 @@
+@using Ecommerce.Shared.ViewModels
+@model ProfileViewModel
+@{
+  ViewData["Title"] = "Hồ sơ người dùng";
+}
+
 <section class="bg-white dark:bg-gray-900 py-20 px-6">
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-10 text-center">
       👤 Hồ sơ người dùng
     </h1>
 
-    <!-- Avatar riêng biệt -->
+    <!-- Avatar -->
     <div class="flex justify-center mb-10">
       <div class="flex flex-col items-center gap-4">
-        <img src="/img/vinh_avatar.jpg" alt="Avatar"
+        <img id="avatarImage" src="/img/vinh_avatar.jpg" alt="Avatar"
           class="w-32 h-32 rounded-full object-cover border-4 border-yellow-700 dark:border-yellow-300" />
-        <input type="file" class="file-input file-input-bordered w-full max-w-xs" />
+        <input type="file" id="avatarFile" accept=".jpg,.jpeg,.png"
+          class="file-input file-input-bordered w-full max-w-xs" />
+        <span class="text-red-600 text-sm error" id="avatarFileError"></span>
       </div>
     </div>
 
     <div class="card bg-amber-50 dark:bg-gray-800 shadow-xl p-6">
-      <form enctype="multipart/form-data">
-        <!-- User Info -->
+      <!-- Profile Form -->
+      <form id="profileForm">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="space-y-4">
             <div class="form-control">
               <label class="label">
                 <span class="label-text text-yellow-900 dark:text-yellow-100">Họ và tên</span>
               </label>
-              <input type="text" value="Nguyễn Văn A"
+              <input id="fullName" name="FullName"
                 class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+              <span class="text-red-600 text-sm error" id="fullNameError"></span>
             </div>
             <div class="form-control">
               <label class="label">
                 <span class="label-text text-yellow-900 dark:text-yellow-100">Email</span>
               </label>
-              <input type="email" value="you@example.com"
-                class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+              <input id="email" name="Email" readonly
+                class="input input-bordered bg-gray-200 dark:bg-gray-600 text-yellow-900 dark:text-yellow-100" />
             </div>
             <div class="form-control">
               <label class="label">
                 <span class="label-text text-yellow-900 dark:text-yellow-100">Số điện thoại</span>
               </label>
-              <input type="text" value="0123 456 789"
+              <input id="phoneNumber" name="PhoneNumber"
                 class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+              <span class="text-red-600 text-sm error" id="phoneNumberError"></span>
             </div>
           </div>
 
-          <!-- Địa chỉ, ngày sinh, giới tính -->
           <div class="space-y-4">
             <div class="form-control">
               <label class="label">
                 <span class="label-text text-yellow-900 dark:text-yellow-100">Địa chỉ mặc định</span>
               </label>
-              <textarea
+              <textarea id="defaultAddress" name="DefaultAddress"
                 class="textarea textarea-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
-                rows="3">123 Đường ABC, Quận 1, TP.HCM</textarea>
+                rows="3"></textarea>
+              <span class="text-red-600 text-sm error" id="defaultAddressError"></span>
             </div>
-
             <div class="grid grid-cols-2 gap-4">
               <div class="form-control">
                 <label class="label">
                   <span class="label-text text-yellow-900 dark:text-yellow-100">Ngày sinh</span>
                 </label>
-                <input type="date"
+                <input id="dateOfBirth" name="DateOfBirth" type="text" placeholder="dd-MM-yyyy"
                   class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+                <span class="text-red-600 text-sm error" id="dateOfBirthError"></span>
               </div>
               <div class="form-control">
                 <label class="label">
                   <span class="label-text text-yellow-900 dark:text-yellow-100">Giới tính</span>
                 </label>
-                <select class="select select-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100">
-                  <option>Nam</option>
-                  <option>Nữ</option>
-                  <option>Khác</option>
+                <select id="gender" name="Gender"
+                  class="select select-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100">
+                  <option value="">Chọn giới tính</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                  <option value="Khác">Khác</option>
                 </select>
+                <span class="text-red-600 text-sm error" id="genderError"></span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Dị ứng -->
         <div class="form-control mt-10">
           <label class="label">
             <span class="label-text text-yellow-900 dark:text-yellow-100">Ghi chú khẩu vị / dị ứng</span>
           </label>
-          <textarea class="textarea textarea-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
-            rows="2">Không dùng dâu tây, dị ứng hải sản</textarea>
+          <textarea id="allergyNotes" name="AllergyNotes"
+            class="textarea textarea-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
+            rows="2"></textarea>
+          <span class="text-red-600 text-sm error" id="allergyNotesError"></span>
         </div>
 
-        <!-- Đổi mật khẩu -->
-        <div class="mt-12 border-t border-amber-200 dark:border-gray-700 pt-6">
-          <h2 class="text-xl font-semibold text-yellow-900 dark:text-yellow-300 mb-4">🔒 Đổi mật khẩu</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <input type="password" placeholder="Mật khẩu hiện tại"
+        <!-- Save Profile Button -->
+        <div class="text-end mt-10">
+          <button type="button" id="saveProfileButton" class="btn bg-yellow-800 hover:bg-yellow-700 text-white">
+            💾 Lưu hồ sơ
+          </button>
+        </div>
+      </form>
+
+      <!-- Change Password Form -->
+      <form id="passwordForm" class="mt-12 border-t border-amber-200 dark:border-gray-700 pt-6">
+        <h2 class="text-xl font-semibold text-yellow-900 dark:text-yellow-300 mb-4">🔒 Đổi mật khẩu</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="form-control">
+            <input id="currentPassword" name="CurrentPassword" placeholder="Mật khẩu hiện tại" type="password"
               class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-            <input type="password" placeholder="Mật khẩu mới"
+            <span class="text-red-600 text-sm error" id="currentPasswordError"></span>
+          </div>
+          <div class="form-control">
+            <input id="newPassword" name="NewPassword" placeholder="Mật khẩu mới" type="password"
               class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
-            <input type="password" placeholder="Xác nhận mật khẩu mới"
+            <span class="text-red-600 text-sm error" id="newPasswordError"></span>
+          </div>
+          <div class="form-control">
+            <input id="confirmNewPassword" name="ConfirmNewPassword" placeholder="Xác nhận mật khẩu mới" type="password"
               class="input input-bordered bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" />
+            <span class="text-red-600 text-sm error" id="confirmNewPasswordError"></span>
           </div>
         </div>
 
-        <!-- Submit -->
-        <div class="text-end mt-10">
-          <button type="submit" class="btn bg-yellow-800 hover:bg-yellow-700 text-white">
-            💾 Lưu thay đổi
+        <!-- Save Password Button -->
+        <div class="text-end mt-6">
+          <button type="button" id="savePasswordButton" class="btn bg-yellow-800 hover:bg-yellow-700 text-white">
+            🔒 Đổi mật khẩu
           </button>
         </div>
       </form>
     </div>
   </div>
 </section>
+
+@section Scripts {
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Load profile data when page loads
+      loadProfile();
+
+      // Handle save profile button click
+      $('#saveProfileButton').click(function () {
+        saveProfile();
+      });
+
+      // Handle save password button click
+      $('#savePasswordButton').click(function () {
+        changePassword();
+      });
+
+      // Handle avatar file change
+      $('#avatarFile').change(function () {
+        uploadAvatar();
+      });
+
+      // Load profile data via AJAX
+      function loadProfile() {
+        console.log('Sending GET /account/GetProfile');
+        $.ajax({
+          url: '/account/GetProfile',
+          type: 'GET',
+          success: function (response) {
+            console.log('GetProfile response:', JSON.stringify(response, null, 2));
+            if (response.success) {
+              $('#fullName').val(response.data.fullName || '');
+              $('#email').val(response.data.email || '');
+              $('#phoneNumber').val(response.data.phoneNumber || '');
+              $('#dateOfBirth').val(response.data.dateOfBirth || '');
+              $('#gender').val(response.data.gender || '');
+              $('#defaultAddress').val(response.data.defaultAddress || '');
+              $('#allergyNotes').val(response.data.allergyNotes || '');
+              $('#avatarImage').attr('src', response.data.avatarUrl || '/img/vinh_avatar.jpg');
+            } else {
+              showToast('Lỗi: ' + response.message + (response.errors ? '\n' + response.errors.join('\n') : ''), 'error');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('GetProfile error:', xhr, status, error);
+            showToast('Không thể tải thông tin hồ sơ: ' + error, 'error');
+          }
+        });
+      }
+
+      // Save profile via AJAX
+      function saveProfile() {
+        // Clear previous errors
+        $('.error').text('');
+
+        const profileData = {
+          email: $('#email').val(),
+          fullName: $('#fullName').val(),
+          phoneNumber: $('#phoneNumber').val(),
+          dateOfBirth: $('#dateOfBirth').val(),
+          gender: $('#gender').val(),
+          defaultAddress: $('#defaultAddress').val(),
+          allergyNotes: $('#allergyNotes').val()
+        };
+
+        console.log('Sending POST /account/UpdateProfile with data:', JSON.stringify(profileData, null, 2));
+        $.ajax({
+          url: '/account/UpdateProfile',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(profileData),
+          success: function (response) {
+            console.log('UpdateProfile response:', JSON.stringify(response, null, 2));
+            if (response.success) {
+              showToast(response.message, 'success');
+            } else {
+              showToast('Lỗi: ' + response.message + (response.errors ? '\n' + response.errors.join('\n') : ''), 'error');
+              if (response.errors) {
+                response.errors.forEach(error => {
+                  if (error.toLowerCase().includes('fullname')) $('#fullNameError').text(error);
+                  if (error.toLowerCase().includes('phonenumber')) $('#phoneNumberError').text(error);
+                  if (error.toLowerCase().includes('dateofbirth')) $('#dateOfBirthError').text(error);
+                  if (error.toLowerCase().includes('gender')) $('#genderError').text(error);
+                  if (error.toLowerCase().includes('defaultaddress')) $('#defaultAddressError').text(error);
+                  if (error.toLowerCase().includes('allergynotes')) $('#allergyNotesError').text(error);
+                });
+              }
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('UpdateProfile error:', xhr, status, error);
+            showToast('Không thể cập nhật hồ sơ: ' + error, 'error');
+          }
+        });
+      }
+
+      // Change password via AJAX
+      function changePassword() {
+        // Clear previous errors
+        $('.error').text('');
+
+        const passwordData = {
+          currentPassword: $('#currentPassword').val(),
+          newPassword: $('#newPassword').val(),
+          confirmNewPassword: $('#confirmNewPassword').val()
+        };
+
+        console.log('Sending POST /account/ChangePassword with data:', JSON.stringify(passwordData, null, 2));
+        $.ajax({
+          url: '/account/ChangePassword',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(passwordData),
+          success: function (response) {
+            console.log('ChangePassword response:', JSON.stringify(response, null, 2));
+            if (response.success) {
+              showToast(response.message, 'success');
+              $('#currentPassword, #newPassword, #confirmNewPassword').val('');
+            } else {
+              showToast('Lỗi: ' + response.message + (response.errors ? '\n' + response.errors.join('\n') : ''), 'error');
+              if (response.errors) {
+                response.errors.forEach(error => {
+                  if (error.toLowerCase().includes('currentpassword')) $('#currentPasswordError').text(error);
+                  if (error.toLowerCase().includes('newpassword')) $('#newPasswordError').text(error);
+                });
+              }
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('ChangePassword error:', xhr, status, error);
+            showToast('Không thể đổi mật khẩu: ' + error, 'error');
+          }
+        });
+      }
+
+      // Upload avatar via AJAX
+      function uploadAvatar() {
+        const file = $('#avatarFile')[0].files[0];
+        if (!file) {
+          $('#avatarFileError').text('Vui lòng chọn file.');
+          showToast('Vui lòng chọn file để tải lên.', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('avatarFile', file);
+
+        console.log('Sending POST /account/UploadAvatar with file:', file.name);
+        $.ajax({
+          url: '/account/UploadAvatar',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            console.log('UploadAvatar response:', JSON.stringify(response, null, 2));
+            if (response.success) {
+              showToast(response.message, 'success');
+              if (response.data && response.data.avatarUrl) {
+                $('#avatarImage').attr('src', response.data.avatarUrl);
+              }
+              // Reload profile to ensure consistency
+              loadProfile();
+            } else {
+              showToast('Lỗi: ' + response.message + (response.errors ? '\n' + response.errors.join('\n') : ''), 'error');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('UploadAvatar error:', xhr, status, error);
+            showToast('Không thể tải lên avatar: ' + error, 'error');
+          }
+        });
+      }
+    });
+  </script>
+}

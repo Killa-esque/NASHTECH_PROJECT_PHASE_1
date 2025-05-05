@@ -1,32 +1,30 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using Ecommerce.Infrastructure.Entities;
 using Ecommerce.Infrastructure.Data;
 using AuthorizationServer.Services;
 using AuthorizationServer.Seeders;
 using AuthorizationServer.Mapping;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text.Json;
-using OpenIddict.Server;
-using OpenIddict.Abstractions;
-using System.Security.Claims;
-using Microsoft.AspNetCore;
+using AuthorizationServer.Services.Intefaces;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.UseOpenIddict();
 });
 
+// Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// ⚙️ Cấu hình nhiều cookie scheme: AdminScheme & CustomerScheme
+// Authentication
 builder.Services.AddAuthentication()
     .AddCookie("AdminScheme", options =>
     {
@@ -41,32 +39,34 @@ builder.Services.AddAuthentication()
         options.LoginPath = "/Authenticate_Customer";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
+    })
+    .AddCookie("SwaggerScheme", options =>
+    {
+        options.Cookie.Name = ".AspNetCore.Identity.Swagger";
+        options.LoginPath = "/Authenticate_Swagger";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
     });
 
-// builder.Services.ConfigureApplicationCookie(options =>
-// {
-//     options.Cookie.Name = ".AspNetCore.Identity";
-//     options.LoginPath = "/Authenticate";
-//     options.ExpireTimeSpan = TimeSpan.FromDays(7);
-//     options.SlidingExpiration = true;
-// });
+builder.Services.AddAuthorization();
 
-
+// OpenIddict
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
         options.UseEntityFrameworkCore()
-            .UseDbContext<AppDbContext>();
+               .UseDbContext<AppDbContext>();
     })
     .AddServer(options =>
     {
+        options.SetIssuer("https://localhost:5000/");
         options.SetAuthorizationEndpointUris("connect/authorize")
                .SetEndSessionEndpointUris("connect/logout")
                .SetTokenEndpointUris("connect/token")
                .SetRevocationEndpointUris("connect/revocation")
                .SetUserInfoEndpointUris("connect/userinfo");
 
-        options.RegisterScopes(Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess, "ecommerce_api");
+        options.RegisterScopes(Scopes.OpenId, Scopes.Profile, Scopes.Email, Scopes.Roles, "ecommerce_api", Scopes.OfflineAccess);
 
         options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
         options.SetRefreshTokenLifetime(TimeSpan.FromDays(14));
@@ -76,6 +76,8 @@ builder.Services.AddOpenIddict()
 
         options.AddEncryptionKey(new SymmetricSecurityKey(Convert.FromBase64String("DRjd/GnduI3Efzen9V9BvbNUfc/VKgXltV7Kbk9sMkY=")));
 
+        options.DisableAccessTokenEncryption();
+
         options.AddDevelopmentEncryptionCertificate()
                .AddDevelopmentSigningCertificate();
 
@@ -83,12 +85,18 @@ builder.Services.AddOpenIddict()
                .EnableTokenEndpointPassthrough()
                .EnableEndSessionEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
-
     });
 
+// Services
 builder.Services.AddTransient<AuthorizationService>();
 builder.Services.AddTransient<ClientsSeeder>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+// Controllers
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -98,9 +106,7 @@ builder.Services.AddControllers()
     });
 builder.Services.AddRazorPages();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -112,30 +118,29 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Seed Data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     var identitySeeder = new IdentitySeeder(services);
     await identitySeeder.SeedAsync();
-
     var clientsSeeder = new ClientsSeeder(services);
     await clientsSeeder.SeedAsync();
 }
 
+// Middleware
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
 app.UseCors();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapRazorPages();
 

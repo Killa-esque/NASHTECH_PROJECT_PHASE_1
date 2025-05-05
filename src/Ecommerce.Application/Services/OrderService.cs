@@ -1,5 +1,5 @@
 using AutoMapper;
-using Ecommerce.Application.DTOs;
+using Ecommerce.Shared.DTOs;
 using Ecommerce.Application.Interfaces.Repositories;
 using Ecommerce.Application.Interfaces.Services;
 using Ecommerce.Domain.Entities;
@@ -12,10 +12,12 @@ public class OrderService : IOrderService
 {
   private readonly IOrderRepository _orderRepository;
   private readonly IProductRepository _productRepository;
+  private readonly ICartRepository _cartRepository;
   private readonly IMapper _mapper;
 
-  public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IMapper mapper)
+  public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, IMapper mapper, ICartRepository cartRepository)
   {
+    _cartRepository = cartRepository;
     _orderRepository = orderRepository;
     _productRepository = productRepository;
     _mapper = mapper;
@@ -109,23 +111,45 @@ public class OrderService : IOrderService
       await _productRepository.UpdateAsync(product);
     }
 
+
     await _orderRepository.AddAsync(order);
     await _orderRepository.AddOrderItemsAsync(orderItems);
     await _orderRepository.SaveChangesAsync();
+
+    // Clear User Cart After Order Created
+    var afftectedRows = await _cartRepository.ClearCartAsync(userId);
+
+    if (afftectedRows == 0)
+      return Result.Failure<Guid>("Failed to clear cart after order creation.");
 
     return Result.Success(order.Id, "Order created successfully.");
   }
 
   public async Task<Result<OrderDto>> GetOrderDetailsAsync(Guid orderId)
   {
+    if (orderId == Guid.Empty)
+      return Result.Failure<OrderDto>("ID đơn hàng không hợp lệ.");
+
     var order = await _orderRepository.GetByIdAsync(orderId);
     if (order == null)
       return Result.Failure<OrderDto>("Order not found.");
 
     var orderItems = await _orderRepository.GetOrderItemsByOrderIdAsync(orderId);
 
+    // Lấy ProductName từ Products
+    var productIds = orderItems.Select(oi => oi.ProductId).ToList();
+    var products = await _productRepository.GetByIdsAsync(productIds);
+    var productDict = products.ToDictionary(p => p.Id, p => p.Name);
+
     var orderDto = _mapper.Map<OrderDto>(order);
-    orderDto.Items = _mapper.Map<List<OrderItemDto>>(orderItems);
+    orderDto.Items = orderItems.Select(oi => new OrderItemDto
+    {
+      Id = oi.Id,
+      ProductId = oi.ProductId,
+      ProductName = productDict.ContainsKey(oi.ProductId) ? productDict[oi.ProductId] : "Unknown",
+      Quantity = oi.Quantity,
+      Price = oi.UnitPrice
+    }).ToList();
 
     return Result.Success(orderDto, "Order details retrieved successfully.");
   }
@@ -179,6 +203,15 @@ public class OrderService : IOrderService
     await _orderRepository.SaveChangesAsync();
 
     return Result.Success("Order updated successfully.");
+  }
+
+  public async Task<Result<string>> GetOrderCodeAsync(Guid orderId)
+  {
+    var order = await _orderRepository.GetByIdAsync(orderId);
+    if (order == null)
+      return Result.Failure<string>("Order not found.");
+
+    return Result.Success(order.OrderCode, "Order code retrieved successfully.");
   }
 
   private bool CanModifyOrder(Order order)

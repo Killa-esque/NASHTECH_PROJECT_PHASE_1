@@ -6,6 +6,8 @@ public class PagedResult<T>
   public int PageIndex { get; set; }
   public int PageSize { get; set; }
 
+  public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize); // Tính tổng số trang
+
   private PagedResult(IEnumerable<T> items, int count, int pageIndex, int pageSize)
   {
     Items = items;
