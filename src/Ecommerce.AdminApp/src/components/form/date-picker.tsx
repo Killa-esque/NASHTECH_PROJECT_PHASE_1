@@ -1,10 +1,14 @@
 import { CalenderIcon } from "@/icons";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import { useEffect } from "react";
 import Label from "./Label";
 import Hook = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
+
+dayjs.extend(customParseFormat);
 
 type PropsType = {
   id: string;
@@ -28,8 +32,8 @@ export default function DatePicker({
       mode: mode || "single",
       static: true,
       monthSelectorType: "static",
-      dateFormat: "Y-m-d",
-      defaultDate,
+      dateFormat: "d-m-Y", // Người dùng nhìn thấy dd-MM-yyyy
+      defaultDate: defaultDate, // <- nhận kiểu Date hoặc ISO string đều ok
       onChange,
     });
 

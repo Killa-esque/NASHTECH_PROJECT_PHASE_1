@@ -3,12 +3,12 @@ using System.Text;
 using System.Text.Json;
 using Ecommerce.Application.Interfaces.Services;
 using Microsoft.Extensions.Logging;
-
 namespace Ecommerce.Infrastructure.Providers.Storage;
 
 public class SupabaseStorageProvider : ISupabaseStorageService
 {
   private readonly HttpClient _httpClient;
+
   private readonly string _bucketName = "product-images";
   private readonly string _supabaseUrl = "https://qztbgbjkjylxrxratybn.supabase.co";
   private readonly string _supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6dGJnYmpranlseHJ4cmF0eWJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTM5MTU3MSwiZXhwIjoyMDYwOTY3NTcxfQ.yDZEbLd4W48cxsxJInjD-vtbDy66YFI5DZpnaRr9Jas";
@@ -135,11 +135,13 @@ public class SupabaseStorageProvider : ISupabaseStorageService
     }
   }
 
-  public async Task<string> UploadProductImageAsync(Stream fileStream, string fileName, string contentType, Guid productId)
+  private async Task<string> UploadProductImageAsync(Stream fileStream, string fileName, string contentType, Guid productId)
   {
     var uniqueFileName = $"{Guid.NewGuid()}-{fileName}";
-    var request = new HttpRequestMessage(HttpMethod.Post, $"/storage/v1/object/{_bucketName}/Product/{productId}/{uniqueFileName}");
-    request.Content = new StreamContent(fileStream);
+    var request = new HttpRequestMessage(HttpMethod.Post, $"/storage/v1/object/{_bucketName}/Product/{productId}/{uniqueFileName}")
+    {
+      Content = new StreamContent(fileStream)
+    };
     request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
     request.Headers.Add("x-upsert", "true");
 
@@ -147,7 +149,9 @@ public class SupabaseStorageProvider : ISupabaseStorageService
     var responseBody = await response.Content.ReadAsStringAsync();
 
     if (!response.IsSuccessStatusCode)
-      throw new Exception($"Failed to upload image: {response.StatusCode}, {responseBody}");
+    {
+      throw new Exception($"Upload failed: {response.StatusCode} - {responseBody}");
+    }
 
     return $"{_supabaseUrl}/storage/v1/object/public/{_bucketName}/Product/{productId}/{uniqueFileName}";
   }
@@ -157,11 +161,21 @@ public class SupabaseStorageProvider : ISupabaseStorageService
     var imageUrls = new List<string>();
     foreach (var file in files)
     {
-      var imageUrl = await UploadProductImageAsync(file.fileStream, file.fileName, file.contentType, productId);
-      imageUrls.Add(imageUrl);
+      var url = await UploadProductImageAsync(file.fileStream, file.fileName, file.contentType, productId);
+      imageUrls.Add(url);
     }
     return imageUrls;
   }
+
+  public async Task<bool> DeleteProductImageAsync(Guid productId, string imageFileName)
+  {
+    var path = $"/storage/v1/object/{_bucketName}/Product/{productId}/{imageFileName}";
+    var request = new HttpRequestMessage(HttpMethod.Delete, path);
+
+    var response = await _httpClient.SendAsync(request);
+    return response.IsSuccessStatusCode;
+  }
+
 }
 
 public class SupabaseFile
@@ -173,3 +187,5 @@ public class SupabaseFile
   public DateTime LastAccessedAt { get; set; }
   public Dictionary<string, object> Metadata { get; set; }
 }
+
+

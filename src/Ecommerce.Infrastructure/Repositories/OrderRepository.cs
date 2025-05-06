@@ -14,6 +14,22 @@ public class OrderRepository : IOrderRepository
     _context = context;
   }
 
+  public async Task<IEnumerable<Order>> GetByCustomerIdAsync(string customerId, int pageIndex, int pageSize)
+  {
+    return await _context.Orders
+        .Where(o => o.UserId == customerId)
+        .OrderByDescending(o => o.CreatedDate)
+        .Skip((pageIndex - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+  }
+  public async Task<int> CountByCustomerIdAsync(string customerId)
+  {
+    return await _context.Orders
+        .Where(o => o.UserId == customerId)
+        .CountAsync();
+  }
+
   public async Task<Order> GetByIdAsync(Guid id)
   {
     var order = await _context.Orders
@@ -89,6 +105,20 @@ public class OrderRepository : IOrderRepository
     existingOrder.UpdatedDate = DateTime.UtcNow;
   }
 
+  public async Task<bool> DeleteByUserIdAsync(string userId)
+  {
+    var orders = await _context.Orders
+        .Where(o => o.UserId == userId)
+        .ToListAsync();
+
+    if (orders.Count == 0)
+    {
+      return false;
+    }
+
+    _context.Orders.RemoveRange(orders);
+    return true;
+  }
 
   public async Task<int> SaveChangesAsync()
   {

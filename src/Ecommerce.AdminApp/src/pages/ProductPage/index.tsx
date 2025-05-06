@@ -1,20 +1,3 @@
-// src/pages/ProductPage/index.tsx
-import {
-  CreateProductDto,
-  ProductResponseDto,
-  UpdateProductDto,
-} from "@/api/product/productTypes";
-import { useAuth } from "@/hooks/useAuth";
-import { useModal } from "@/hooks/useModal";
-import {
-  useCreateProduct,
-  useDeleteProduct,
-  useGetProducts,
-  useUpdateProduct,
-} from "@/hooks/useProduct";
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import PageMeta from "@/components/common/PageMeta";
@@ -22,70 +5,92 @@ import ProductModal from "@/components/product/ProductModal";
 import ProductTable from "@/components/product/ProductTable";
 import Button from "@/components/ui/button/Button";
 import ConfirmDeleteModal from "@/components/ui/modal/ConfirmDeleteModal";
+import { useAuth } from "@/hooks/useAuth";
+import { useModal } from "@/hooks/useModal";
+import { useProduct } from "@/hooks/useProduct";
+import { ICreateProduct, IProduct, IUpdateProduct } from "@/types/types";
 import { message } from "antd";
+import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 
 export default function Product() {
   const { isAuthenticated, isAdminUser, isLoading: authLoading } = useAuth();
-  const [selectedProduct, setSelectedProduct] =
-    useState<ProductResponseDto | null>(null);
+  const {
+    useProducts,
+    useProductById,
+    useCreateProduct,
+    useUpdateProduct,
+    useDeleteProduct,
+  } = useProduct();
+  const [pageIndex, setPageIndex] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const { data, isLoading, isFetching, error } = useProducts(
+    pageIndex,
+    pageSize
+  );
+  const products = data?.items || [];
+  const totalCount = data?.totalCount || 0;
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+  const deleteProductMutation = useDeleteProduct();
 
   const createModal = useModal();
   const editModal = useModal();
   const deleteModal = useModal();
 
-  const {
-    data: products = [],
-    isLoading,
-    isFetching,
-    error,
-  } = useGetProducts();
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null
+  );
+  const { data: selectedProduct, isLoading: productLoading } = useProductById(
+    selectedProductId || ""
+  );
 
   useEffect(() => {
-    console.log("useGetProducts State:", {
+    console.log("useProducts State:", {
       products,
       isLoading,
       isFetching,
       error,
     });
     if (error) {
-      message.error(`Failed to fetch products: ${(error as Error).message}`);
+      message.error(`Failed to fetch products: ${error.message}`);
     }
   }, [products, isLoading, isFetching, error]);
 
-  const createProductMutation = useCreateProduct();
-  const updateProductMutation = useUpdateProduct();
-  const deleteProductMutation = useDeleteProduct();
-
   const handleCreate = () => {
-    setSelectedProduct(null);
+    setSelectedProductId(null);
     createModal.openModal();
   };
 
-  const handleEdit = (product: ProductResponseDto) => {
-    setSelectedProduct(product);
+  const handleEdit = (product: IProduct) => {
+    setSelectedProductId(product.id);
     editModal.openModal();
   };
 
-  const handleDelete = (product: ProductResponseDto) => {
-    setSelectedProduct(product);
+  const handleDelete = (product: IProduct) => {
+    setSelectedProductId(product.id);
     deleteModal.openModal();
   };
 
-  const handleCreateSubmit = async (data: CreateProductDto) => {
+  const handleCreateSubmit = async (data: ICreateProduct) => {
     try {
-      await createProductMutation.mutateAsync(data);
+      const response = await createProductMutation.mutateAsync(data);
       createModal.closeModal();
+      message.success("Product created successfully");
+      return response.data; // Return the product ID for image upload
     } catch (err) {
       console.error("Failed to create product:", err);
       message.error("Failed to create product");
+      throw err;
     }
   };
 
-  const handleEditSubmit = async (data: UpdateProductDto) => {
-    if (!selectedProduct) return;
+  const handleEditSubmit = async (data: IUpdateProduct) => {
+    if (!selectedProductId) return;
     try {
-      await updateProductMutation.mutateAsync({ id: selectedProduct.id, data });
+      await updateProductMutation.mutateAsync({ id: selectedProductId, data });
       editModal.closeModal();
+      message.success("Product updated successfully");
     } catch (err) {
       console.error("Failed to update product:", err);
       message.error("Failed to update product");
@@ -93,14 +98,21 @@ export default function Product() {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedProduct) return;
+    if (!selectedProductId) return;
     try {
-      await deleteProductMutation.mutateAsync(selectedProduct.id);
+      await deleteProductMutation.mutateAsync(selectedProductId);
       deleteModal.closeModal();
+      message.success("Product deleted successfully");
+      setSelectedProductId(null);
     } catch (err) {
       console.error("Failed to delete product:", err);
       message.error("Failed to delete product");
     }
+  };
+
+  const handlePageChange = (newPage: number, newPageSize: number) => {
+    setPageIndex(newPage);
+    setPageSize(newPageSize);
   };
 
   if (authLoading || isLoading || isFetching) {
@@ -116,7 +128,7 @@ export default function Product() {
   }
 
   if (error) {
-    return <div>Error: {(error as Error).message}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   return (
@@ -145,6 +157,12 @@ export default function Product() {
               data={products}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              pagination={{
+                totalCount,
+                pageIndex,
+                pageSize,
+                onPageChange: handlePageChange,
+              }}
             />
           )}
         </ComponentCard>
@@ -158,15 +176,22 @@ export default function Product() {
 
       <ProductModal
         isOpen={editModal.isOpen}
-        onClose={editModal.closeModal}
+        onClose={() => {
+          editModal.closeModal();
+          setSelectedProductId(null);
+        }}
         isEdit
         initialData={selectedProduct || {}}
         onEdit={handleEditSubmit}
+        isLoading={productLoading}
       />
 
       <ConfirmDeleteModal
         isOpen={deleteModal.isOpen}
-        onClose={deleteModal.closeModal}
+        onClose={() => {
+          deleteModal.closeModal();
+          setSelectedProductId(null);
+        }}
         onConfirm={handleDeleteConfirm}
         objectType="sản phẩm"
         targetLabel={selectedProduct?.name}

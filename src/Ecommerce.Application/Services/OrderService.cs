@@ -34,6 +34,17 @@ public class OrderService : IOrderService
     return Result.Success(pagedResult, "Orders retrieved successfully.");
   }
 
+  public async Task<Result<PagedResult<OrderDto>>> GetOrdersByCustomerIdAsync(string customerId, int pageIndex, int pageSize)
+  {
+    var orders = await _orderRepository.GetByCustomerIdAsync(customerId, pageIndex, pageSize);
+    var totalCount = await _orderRepository.CountByCustomerIdAsync(customerId);
+
+    var orderDtos = _mapper.Map<List<OrderDto>>(orders);
+    var pagedResult = PagedResult<OrderDto>.Create(orderDtos, totalCount, pageIndex, pageSize);
+
+    return Result.Success(pagedResult, "Orders retrieved successfully.");
+  }
+
   public async Task<Result> CancelOrderAsync(Guid orderId)
   {
     var order = await _orderRepository.GetByIdAsync(orderId);
@@ -212,6 +223,36 @@ public class OrderService : IOrderService
       return Result.Failure<string>("Order not found.");
 
     return Result.Success(order.OrderCode, "Order code retrieved successfully.");
+  }
+
+  public async Task<Result<bool>> DeleteOrdersByUserIdAsync(string userId)
+  {
+    var orders = await _orderRepository.GetByUserIdAsync(userId, 1, int.MaxValue);
+    if (orders == null || !orders.Any())
+      return Result.Success(true, "No orders found for this user.");
+
+    foreach (var order in orders)
+    {
+      if (CanModifyOrder(order))
+      {
+        order.Status = OrderStatus.Cancelled;
+        await _orderRepository.UpdateAsync(order);
+      }
+    }
+
+    await _orderRepository.SaveChangesAsync();
+
+    // After canceling orders, delete them
+    var result = await _orderRepository.DeleteByUserIdAsync(userId);
+
+    if (result == false)
+    {
+      return Result.Success(true, "User not found or no orders to delete.");
+    }
+
+    await _orderRepository.SaveChangesAsync();
+
+    return Result.Success(true, "Orders deleted successfully.");
   }
 
   private bool CanModifyOrder(Order order)

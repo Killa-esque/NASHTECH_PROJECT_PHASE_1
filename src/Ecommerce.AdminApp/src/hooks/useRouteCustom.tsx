@@ -1,4 +1,3 @@
-// src/hooks/useRouteCustom.tsx
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import AppLayout from "@/layout/AppLayout";
 import { lazy } from "react";
@@ -15,18 +14,6 @@ const Customer = lazy(() => import("@/pages/CustomerPage"));
 const Product = lazy(() => import("@/pages/ProductPage"));
 const OrderList = lazy(() => import("@/pages/OrderPage"));
 const OrderDetail = lazy(() => import("@/pages/OrderPage/OrderDetail"));
-const Videos = lazy(() => import("@/pages/UiElements/Videos"));
-const Images = lazy(() => import("@/pages/UiElements/Images"));
-const Alerts = lazy(() => import("@/pages/UiElements/Alerts"));
-const Badges = lazy(() => import("@/pages/UiElements/Badges"));
-const Avatars = lazy(() => import("@/pages/UiElements/Avatars"));
-const Buttons = lazy(() => import("@/pages/UiElements/Buttons"));
-const LineChart = lazy(() => import("@/pages/Charts/LineChart"));
-const BarChart = lazy(() => import("@/pages/Charts/BarChart"));
-const Calendar = lazy(() => import("@/pages/Calendar"));
-const BasicTables = lazy(() => import("@/pages/Tables/BasicTables"));
-const FormElements = lazy(() => import("@/pages/Forms/FormElements"));
-const Blank = lazy(() => import("@/pages/Blank"));
 const Home = lazy(() => import("@/pages/Dashboard/Home"));
 
 function useRouteCustom() {
@@ -87,102 +74,6 @@ function useRouteCustom() {
           element: (
             <ProtectedRoute>
               <OrderDetail />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/calendar",
-          element: (
-            <ProtectedRoute>
-              <Calendar />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/blank",
-          element: (
-            <ProtectedRoute>
-              <Blank />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/form-elements",
-          element: (
-            <ProtectedRoute>
-              <FormElements />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/basic-tables",
-          element: (
-            <ProtectedRoute>
-              <BasicTables />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/alerts",
-          element: (
-            <ProtectedRoute>
-              <Alerts />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/avatars",
-          element: (
-            <ProtectedRoute>
-              <Avatars />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/badge",
-          element: (
-            <ProtectedRoute>
-              <Badges />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/buttons",
-          element: (
-            <ProtectedRoute>
-              <Buttons />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/images",
-          element: (
-            <ProtectedRoute>
-              <Images />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/videos",
-          element: (
-            <ProtectedRoute>
-              <Videos />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/line-chart",
-          element: (
-            <ProtectedRoute>
-              <LineChart />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "/bar-chart",
-          element: (
-            <ProtectedRoute>
-              <BarChart />
             </ProtectedRoute>
           ),
         },

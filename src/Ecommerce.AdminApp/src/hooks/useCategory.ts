@@ -1,53 +1,80 @@
-import categoryService from "@/api/category/categoryService";
-import {
-  CategoryResponseDto,
-  CreateCategoryDto,
-  UpdateCategoryDto,
-} from "@/api/category/categoryTypes";
+// src/api/useCategory.ts
+import { categoryService } from "@/api/category/categoryService";
+import { ICategory, ICreateCategory, IUpdateCategory } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const CATEGORY_QUERY_KEYS = {
-  all: ["categories"] as const,
-  detail: (id: string) => [...CATEGORY_QUERY_KEYS.all, id] as const,
-};
-
-export const useGetCategories = () => {
-  return useQuery<CategoryResponseDto[], Error>({
-    queryKey: CATEGORY_QUERY_KEYS.all,
-    queryFn: categoryService.getCategories,
-  });
-};
-
-export const useCreateCategory = () => {
+export const useCategory = () => {
   const queryClient = useQueryClient();
-  return useMutation<CategoryResponseDto, Error, CreateCategoryDto>({
-    mutationFn: categoryService.createCategory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CATEGORY_QUERY_KEYS.all });
-    },
-  });
-};
 
-export const useUpdateCategory = () => {
-  const queryClient = useQueryClient();
-  return useMutation<
-    CategoryResponseDto,
-    Error,
-    { id: string; data: UpdateCategoryDto }
-  >({
-    mutationFn: ({ id, data }) => categoryService.updateCategory(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CATEGORY_QUERY_KEYS.all });
-    },
-  });
-};
+  // Fetch all categories
+  const useCategories = (pageIndex: number = 1, pageSize: number = 10) =>
+    useQuery<PagedResult<ICategory>, Error>({
+      queryKey: ["categories", pageIndex, pageSize],
+      queryFn: async () => {
+        const response = await categoryService.getAll(pageIndex, pageSize);
+        if (!response.status || !response.data) {
+          throw new Error(response.error || "Failed to fetch categories");
+        }
+        return response.data;
+      },
+    });
 
-export const useDeleteCategory = () => {
-  const queryClient = useQueryClient();
-  return useMutation<void, Error, string>({
-    mutationFn: categoryService.deleteCategory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CATEGORY_QUERY_KEYS.all });
-    },
-  });
+  // Fetch category by ID
+  const useCategoryById = (id: string) =>
+    useQuery<ICategory, Error>({
+      queryKey: ["category", id],
+      queryFn: async () => {
+        const response = await categoryService.getById(id);
+        if (!response.status || !response.data) {
+          throw new Error(response.error || "Failed to fetch category");
+        }
+        return response.data;
+      },
+      enabled: !!id,
+    });
+
+  // Create category
+  const useCreateCategory = () =>
+    useMutation<HttpResponse<string>, Error, ICreateCategory>({
+      mutationFn: categoryService.create,
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["categories"] });
+        }
+      },
+    });
+
+  // Update category
+  const useUpdateCategory = () =>
+    useMutation<
+      HttpResponse<string>,
+      Error,
+      { id: string; data: IUpdateCategory }
+    >({
+      mutationFn: ({ id, data }) => categoryService.update(id, data),
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["categories"] });
+        }
+      },
+    });
+
+  // Delete category
+  const useDeleteCategory = () =>
+    useMutation<HttpResponse<string>, Error, string>({
+      mutationFn: categoryService.delete,
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["categories"] });
+        }
+      },
+    });
+
+  return {
+    useCategories,
+    useCategoryById,
+    useCreateCategory,
+    useUpdateCategory,
+    useDeleteCategory,
+  };
 };

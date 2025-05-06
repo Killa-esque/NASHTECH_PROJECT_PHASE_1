@@ -14,4 +14,7 @@ public interface IOrderRepository
   Task<IEnumerable<Order>> GetAllAsync(int pageIndex, int pageSize);
   Task<int> CountAllAsync();
   Task<int> SaveChangesAsync();
+  Task<IEnumerable<Order>> GetByCustomerIdAsync(string customerId, int pageIndex, int pageSize);
+  Task<int> CountByCustomerIdAsync(string customerId);
+  Task<bool> DeleteByUserIdAsync(string userId);
 }

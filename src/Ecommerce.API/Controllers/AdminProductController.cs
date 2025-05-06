@@ -82,4 +82,28 @@ public class AdminProductController : ControllerBase
 
     return Ok(ApiResponse<string>.Success("Product featured status updated."));
   }
+
+  [HttpPost("{id}/images")]
+  public async Task<IActionResult> UploadImages(Guid id, [FromForm] List<IFormFile> files)
+  {
+    var fileData = files.Select(f => ((Stream)f.OpenReadStream(), f.FileName, f.ContentType)).ToList();
+    var result = await _productService.AddProductImagesAsync(id, fileData);
+
+    if (!result.IsSuccess)
+      return BadRequest(ApiResponse<string>.Fail(result.Message));
+
+    return Ok(ApiResponse<string>.Success("Images uploaded."));
+  }
+
+  [HttpDelete("{id}/images")]
+  public async Task<IActionResult> DeleteImage(Guid id, [FromQuery] string imageUrl)
+  {
+    var result = await _productService.DeleteProductImageAsync(id, imageUrl);
+
+    if (!result.IsSuccess)
+      return BadRequest(ApiResponse<string>.Fail(result.Message));
+
+    return Ok(ApiResponse<string>.Success("Image deleted."));
+  }
+
 }

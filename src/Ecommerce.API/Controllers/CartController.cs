@@ -69,6 +69,6 @@ public class CartController : ControllerBase
   private string GetUserId()
   {
     // Later, use: return User.FindFirst("sub")?.Value
-    return "a2ad953e-1482-4cf2-9b94-41c88aeb90e3";
+    return "a8a9b907-81a6-41c9-90ff-eb2158c52044";
   }
 }

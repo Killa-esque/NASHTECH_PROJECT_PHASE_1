@@ -25,7 +25,8 @@ public class MappingProfile : Profile
     CreateMap<CategoryDto, Category>().ReverseMap();
     CreateMap<ProductDto, Product>().ReverseMap();
     CreateMap<PaymentTransactionDto, PaymentTransaction>().ReverseMap();
-    CreateMap<OrderDto, Order>().ReverseMap();
+    CreateMap<Order, OrderDto>()
+    .ForMember(dest => dest.DeliveryDate, opt => opt.MapFrom(src => src.DeliveryDate));
     CreateMap<OrderItemDto, OrderItem>().ReverseMap();
     // CreateMap<CartItemDto, CartItem>().ReverseMap();
     CreateMap<CartItem, CartItemDto>()

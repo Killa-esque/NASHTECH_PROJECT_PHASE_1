@@ -11,7 +11,7 @@ let userManager: UserManager;
 const config: UserManagerSettings = {
   authority: import.meta.env.VITE_AUTH_AUTHORITY,
   client_id: import.meta.env.VITE_AUTH_CLIENT_ID,
-  client_secret: import.meta.env.VITE_AUTH_CLIENT_SECRET, // không cần thiết nếu PKCE, nhưng bạn giữ cũng OK
+  // client_secret: import.meta.env.VITE_AUTH_CLIENT_SECRET, // không cần thiết nếu PKCE, nhưng bạn giữ cũng OK
   redirect_uri: import.meta.env.VITE_AUTH_REDIRECT_URI,
   post_logout_redirect_uri: import.meta.env.VITE_AUTH_POST_LOGOUT_REDIRECT_URI,
   response_type: "code", // Authorization Code Flow

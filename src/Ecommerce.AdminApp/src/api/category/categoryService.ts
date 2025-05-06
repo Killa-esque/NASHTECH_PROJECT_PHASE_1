@@ -1,61 +1,60 @@
-import {
-  CategoryListResponseSchema,
-  CategoryResponseDto,
-  CategoryResponseSchema,
-  CreateCategoryDto,
-  UpdateCategoryDto,
-} from "@/api/category/categoryTypes";
+// src/api/categoryService.ts
+
+import { ICategory, ICreateCategory, IUpdateCategory } from "@/types/types";
 import { API_URLS } from "../apiUrls";
 import api from "../axiosConfig";
 
-const categoryService = {
-  getCategories: async (): Promise<CategoryResponseDto[]> => {
-    const response = await api.get(API_URLS.CATEGORY.BASE);
-    const validatedResponse = CategoryListResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+export const categoryService = {
+  getAll: async (
+    pageIndex: number = 1,
+    pageSize: number = 10
+  ): Promise<HttpResponse<PagedResult<ICategory>>> => {
+    try {
+      const response = await api.get(API_URLS.CATEGORY.BASE, {
+        params: { pageIndex, pageSize },
+      });
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to fetch categories" };
     }
-    return validatedResponse.data.items;
   },
 
-  createCategory: async (
-    data: CreateCategoryDto
-  ): Promise<CategoryResponseDto> => {
-    const response = await api.post(API_URLS.CATEGORY.BASE, data);
-    const validatedResponse = CategoryResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+  getById: async (id: string): Promise<HttpResponse<ICategory>> => {
+    try {
+      const response = await api.get(API_URLS.CATEGORY.BY_ID(id));
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to fetch category" };
     }
-    return validatedResponse.data;
   },
 
-  updateCategory: async (
+  create: async (category: ICreateCategory): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.post(API_URLS.CATEGORY.BASE, category);
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to create category" };
+    }
+  },
+
+  update: async (
     id: string,
-    data: UpdateCategoryDto
-  ): Promise<CategoryResponseDto> => {
-    const response = await api.patch(`${API_URLS.CATEGORY.BASE}/${id}`, data);
-    const validatedResponse = CategoryResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+    category: IUpdateCategory
+  ): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.put(API_URLS.CATEGORY.BY_ID(id), category);
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to update category" };
     }
-    return validatedResponse.data;
   },
 
-  deleteCategory: async (id: string): Promise<void> => {
-    const response = await api.delete(API_URLS.CATEGORY.BY_ID(id));
-    const validatedResponse = CategoryResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+  delete: async (id: string): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.delete(API_URLS.CATEGORY.BY_ID(id));
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to delete category" };
     }
   },
 };
-
-export default categoryService;

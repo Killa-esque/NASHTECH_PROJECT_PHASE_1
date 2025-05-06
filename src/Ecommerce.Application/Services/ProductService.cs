@@ -10,29 +10,35 @@ namespace Ecommerce.Application.Services;
 public class ProductService : IProductService
 {
   private readonly IProductRepository _productRepository;
+  private readonly ISupabaseStorageService _storageService;
+  private readonly IProductImageRepository _imageRepository;
   private readonly IMapper _mapper;
 
-  public ProductService(IProductRepository productRepository, IMapper mapper)
+  public ProductService(IProductRepository productRepository, IMapper mapper,
+                       ISupabaseStorageService storageService, IProductImageRepository imageRepository)
   {
     _productRepository = productRepository;
     _mapper = mapper;
+    _storageService = storageService;
+    _imageRepository = imageRepository;
   }
 
-  public async Task<Result> AddProductAsync(ProductDto productDto)
+  public async Task<Result<Guid>> AddProductAsync(ProductDto productDto)
   {
     if (productDto == null)
-      return Result.Failure("Product cannot be null.");
+      return Result.Failure<Guid>("Product cannot be null.");
 
     var product = _mapper.Map<Product>(productDto);
     var exists = await _productRepository.ExistsAsync(product.Name);
     if (exists)
-      return Result.Failure("Product already exists.");
+      return Result.Failure<Guid>("Product already exists.");
 
+    product.Id = Guid.NewGuid();
     var affectedRows = await _productRepository.AddAsync(product);
     if (affectedRows == 0)
-      return Result.Failure("Failed to add product.");
+      return Result.Failure<Guid>("Failed to add product.");
 
-    return Result.Success("Product added successfully.");
+    return Result.Success(product.Id, "Product added successfully.");
   }
 
   public async Task<Result> DeleteProductAsync(Guid id)
@@ -158,5 +164,35 @@ public class ProductService : IProductService
       return Result.Failure("Failed to update product.");
 
     return Result.Success("Product updated successfully.");
+  }
+
+  public async Task<Result> AddProductImagesAsync(Guid productId, List<(Stream fileStream, string fileName, string contentType)> files)
+  {
+    var urls = await _storageService.UploadProductImagesAsync(files, productId);
+
+    var imageEntities = urls.Select(url => new ProductImage
+    {
+      Id = Guid.NewGuid(),
+      ProductId = productId,
+      ImageUrl = url,
+      IsPrimary = false,
+      CreatedDate = DateTime.UtcNow
+    }).ToList();
+
+    await _imageRepository.AddRangeAsync(imageEntities);
+    return Result.Success("Images uploaded and saved.");
+  }
+
+  public async Task<Result> DeleteProductImageAsync(Guid productId, string imageUrl)
+  {
+    var image = await _imageRepository.GetByProductIdAndUrlAsync(productId, imageUrl);
+    if (image == null) return Result.Failure("Image not found.");
+
+    var fileName = Path.GetFileName(new Uri(image.ImageUrl).LocalPath);
+    var success = await _storageService.DeleteProductImageAsync(productId, fileName);
+    if (!success) return Result.Failure("Failed to delete image from storage.");
+
+    await _imageRepository.DeleteAsync(image.Id);
+    return Result.Success("Image deleted.");
   }
 }
