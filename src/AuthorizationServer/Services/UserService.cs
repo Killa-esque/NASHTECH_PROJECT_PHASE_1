@@ -54,8 +54,6 @@ public class UserService : IUserService
         var totalCount = await _userManager.Users.CountAsync();
 
         pagedResult = PagedResult<CustomerDto>.Create(customerDtos, totalCount, pageIndex, pageSize);
-        _cache.Set(cacheKey, pagedResult, TimeSpan.FromMinutes(5));
-        _logger.LogInformation("Cached users: cacheKey={CacheKey}", cacheKey);
       }
 
       return ApiResponse<PagedResult<CustomerDto>>.Success(pagedResult, "Users retrieved successfully.");
@@ -105,6 +103,7 @@ public class UserService : IUserService
         UserName = createDto.Email,
         Email = createDto.Email,
         FullName = createDto.FullName,
+        PhoneNumber = createDto.PhoneNumber,
         Gender = createDto.Gender,
         DefaultAddress = createDto.DefaultAddress,
         AvatarUrl = String.Empty,
@@ -251,8 +250,6 @@ public class UserService : IUserService
         }
 
         customerDto = _mapper.Map<CustomerDto>(user);
-        _cache.Set(cacheKey, customerDto, TimeSpan.FromMinutes(10));
-        _logger.LogInformation("Cached profile: cacheKey={CacheKey}", cacheKey);
       }
 
       return ApiResponse<CustomerDto>.Success(customerDto, "Profile retrieved successfully.");

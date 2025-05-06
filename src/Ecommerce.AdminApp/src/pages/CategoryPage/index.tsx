@@ -1,17 +1,4 @@
-import {
-  CategoryResponseDto,
-  CreateCategoryDto,
-  UpdateCategoryDto,
-} from "@/api/category/categoryTypes";
-import {
-  useCreateCategory,
-  useDeleteCategory,
-  useGetCategories,
-  useUpdateCategory,
-} from "@/hooks/useCategory";
-import { useModal } from "@/hooks/useModal";
-import { useEffect, useState } from "react";
-
+// src/pages/CategoryPage.tsx
 import CategoryModal from "@/components/category/CategoryModal";
 import CategoryTable from "@/components/category/CategoryTable";
 import ComponentCard from "@/components/common/ComponentCard";
@@ -19,84 +6,115 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import PageMeta from "@/components/common/PageMeta";
 import Button from "@/components/ui/button/Button";
 import ConfirmDeleteModal from "@/components/ui/modal/ConfirmDeleteModal";
+import { useCategory } from "@/hooks/useCategory";
+import { useModal } from "@/hooks/useModal";
+import { ICategory, ICreateCategory, IUpdateCategory } from "@/types/types";
+import { message } from "antd";
+import { useEffect, useState } from "react";
 
 export default function Category() {
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryResponseDto | null>(null);
+  const {
+    useCategories,
+    useCategoryById,
+    useCreateCategory,
+    useUpdateCategory,
+    useDeleteCategory,
+  } = useCategory();
+  const [pageIndex, setPageIndex] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const { data, isLoading, error, isFetching } = useCategories(
+    pageIndex,
+    pageSize
+  );
+  const categories = data?.items || [];
+  const totalCount = data?.totalCount || 0;
+  const createCategoryMutation = useCreateCategory();
+  const updateCategoryMutation = useUpdateCategory();
+  const deleteCategoryMutation = useDeleteCategory();
 
   const createModal = useModal();
   const editModal = useModal();
   const deleteModal = useModal();
 
-  const {
-    data: categories = [],
-    isLoading,
-    error,
-    isFetching,
-  } = useGetCategories();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
+  const { data: selectedCategory, isLoading: categoryLoading } =
+    useCategoryById(selectedCategoryId || "");
 
   useEffect(() => {
-    console.log("useGetCategories State:", {
+    console.log("useCategories State:", {
       categories,
       isLoading,
       isFetching,
       error,
     });
+    if (error) {
+      message.error(`Failed to fetch categories: ${error.message}`);
+    }
   }, [categories, isLoading, isFetching, error]);
 
-  const createCategoryMutation = useCreateCategory();
-  const updateCategoryMutation = useUpdateCategory();
-  const deleteCategoryMutation = useDeleteCategory();
-
   const handleCreate = () => {
-    setSelectedCategory(null);
+    setSelectedCategoryId(null);
     createModal.openModal();
   };
 
-  const handleEdit = (category: CategoryResponseDto) => {
-    setSelectedCategory(category);
+  const handleEdit = (category: ICategory) => {
+    setSelectedCategoryId(category.id);
     editModal.openModal();
   };
 
-  const handleDelete = (category: CategoryResponseDto) => {
-    setSelectedCategory(category);
+  const handleDelete = (category: ICategory) => {
+    setSelectedCategoryId(category.id);
     deleteModal.openModal();
   };
 
-  const handleCreateSubmit = async (data: CreateCategoryDto) => {
+  const handleCreateSubmit = async (data: ICreateCategory) => {
     try {
       await createCategoryMutation.mutateAsync(data);
       createModal.closeModal();
+      message.success("Category created successfully");
     } catch (err) {
       console.error("Failed to create category:", err);
+      message.error("Failed to create category");
     }
   };
 
-  const handleEditSubmit = async (data: UpdateCategoryDto) => {
-    if (!selectedCategory) return;
+  const handleEditSubmit = async (data: IUpdateCategory) => {
+    if (!selectedCategoryId) return;
     try {
       await updateCategoryMutation.mutateAsync({
-        id: selectedCategory.id,
+        id: selectedCategoryId,
         data,
       });
       editModal.closeModal();
+      message.success("Category updated successfully");
     } catch (err) {
       console.error("Failed to update category:", err);
+      message.error("Failed to update category");
     }
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedCategory) return;
+    if (!selectedCategoryId) return;
     try {
-      await deleteCategoryMutation.mutateAsync(selectedCategory.id);
+      await deleteCategoryMutation.mutateAsync(selectedCategoryId);
       deleteModal.closeModal();
+      message.success("Category deleted successfully");
+      setSelectedCategoryId(null);
     } catch (err) {
       console.error("Failed to delete category:", err);
+      message.error("Failed to delete category");
     }
   };
 
+  const handlePageChange = (newPage: number, newPageSize: number) => {
+    setPageIndex(newPage);
+    setPageSize(newPageSize);
+  };
+
   if (isLoading || isFetching) return <div>Loading...</div>;
-  if (error) return <div>Error: {(error as Error).message}</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>
@@ -124,6 +142,12 @@ export default function Category() {
               data={categories}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              pagination={{
+                totalCount,
+                pageIndex,
+                pageSize,
+                onPageChange: handlePageChange,
+              }}
             />
           )}
         </ComponentCard>
@@ -137,15 +161,22 @@ export default function Category() {
 
       <CategoryModal
         isOpen={editModal.isOpen}
-        onClose={editModal.closeModal}
+        onClose={() => {
+          editModal.closeModal();
+          setSelectedCategoryId(null);
+        }}
         isEdit
         initialData={selectedCategory || {}}
         onEdit={handleEditSubmit}
+        isLoading={categoryLoading}
       />
 
       <ConfirmDeleteModal
         isOpen={deleteModal.isOpen}
-        onClose={deleteModal.closeModal}
+        onClose={() => {
+          deleteModal.closeModal();
+          setSelectedCategoryId(null);
+        }}
         onConfirm={handleDeleteConfirm}
         objectType="danh mục"
         targetLabel={selectedCategory?.name}

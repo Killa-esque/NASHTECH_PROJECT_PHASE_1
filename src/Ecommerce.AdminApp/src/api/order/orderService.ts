@@ -1,39 +1,50 @@
+import { IOrder, IUpdateOrder } from "@/types/types";
 import { API_URLS } from "../apiUrls";
 import api from "../axiosConfig";
-import {
-  OrderListResponseSchema,
-  OrderResponseDto,
-  OrderSingleResponseSchema,
-  UpdateOrderDto,
-  UpdateOrderSchema,
-} from "./orderTypes";
 
 export const orderService = {
-  getOrders: async (): Promise<OrderResponseDto[]> => {
-    const response = await api.get(API_URLS.ORDER.BASE);
-    const validatedResponse = OrderListResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+  getOrders: async (
+    pageIndex: number = 1,
+    pageSize: number = 10,
+    customerId?: string
+  ): Promise<HttpResponse<PagedResult<IOrder>>> => {
+    try {
+      const response = await api.get(API_URLS.ORDER.BASE, {
+        params: { pageIndex, pageSize, customerId },
+      });
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to fetch orders" };
     }
-    return validatedResponse.data.items;
   },
-  getOrderById: async (orderId: string): Promise<OrderResponseDto> => {
-    const response = await api.get(API_URLS.ORDER.BY_ID(orderId));
-    const validatedResponse = OrderSingleResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+
+  getOrderById: async (orderId: string): Promise<HttpResponse<IOrder>> => {
+    try {
+      const response = await api.get(API_URLS.ORDER.BY_ID(orderId));
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to fetch order" };
     }
-    return validatedResponse.data;
   },
+
   updateOrderStatus: async (
     orderId: string,
-    updateData: UpdateOrderDto
-  ): Promise<void> => {
-    const validatedData = UpdateOrderSchema.parse(updateData);
-    await api.post(API_URLS.ORDER.UPDATE_STATUS(orderId), validatedData);
+    data: IUpdateOrder
+  ): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.post(API_URLS.ORDER.UPDATE_STATUS(orderId), data);
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to update order" };
+    }
+  },
+
+  cancelOrder: async (orderId: string): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.post(`/api/admin/orders/${orderId}/cancel`);
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to cancel order" };
+    }
   },
 };

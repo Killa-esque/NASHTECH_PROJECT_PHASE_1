@@ -5,7 +5,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ICustomer } from "@/types/customer";
+import { ICustomer } from "@/types/types";
 
 interface CustomerTableProps {
   data: ICustomer[];
@@ -50,19 +50,7 @@ export default function CustomerTable({
                 isHeader
                 className="px-4 py-2 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Ngày tạo
-              </TableCell>
-              <TableCell
-                isHeader
-                className="px-4 py-2 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Tổng đơn
-              </TableCell>
-              <TableCell
-                isHeader
-                className="px-4 py-2 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Tổng chi tiêu
+                Địa chỉ
               </TableCell>
               <TableCell
                 isHeader
@@ -81,23 +69,16 @@ export default function CustomerTable({
                   </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {customer.userInfo?.email || "-"}
+                  {customer.email || "-"}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {customer.userInfo?.phone || "-"}
+                  {customer.phoneNumber || "-"}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {customer.createdAt || "-"}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {customer.totalOrders ?? 0}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {customer.totalSpent?.toLocaleString() ?? "0"}đ
+                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  {customer.defaultAddress || "-"}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-theme-sm text-start">
                   <div className="flex items-center gap-2">
-                    {/* Nút Edit */}
                     <button
                       onClick={() => onView(customer)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-blue-500 shadow-theme-xs hover:bg-blue-50 hover:text-blue-600 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-white/[0.03] dark:hover:text-blue-300"
@@ -155,8 +136,6 @@ export default function CustomerTable({
                       </svg>
                       Sửa
                     </button>
-
-                    {/* Nút Delete */}
                     <button
                       onClick={() => onDelete(customer)}
                       className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-red-500 shadow-theme-xs hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-white/[0.03] dark:hover:text-red-300"

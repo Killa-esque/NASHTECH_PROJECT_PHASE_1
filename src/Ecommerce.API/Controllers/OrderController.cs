@@ -69,7 +69,7 @@ public class OrderController : ControllerBase
     return BadRequest(ApiResponse<string>.Fail(result.Error));
   }
 
-    // Get order code
+  // Get order code
   [HttpGet("code/{orderId}")]
   public async Task<IActionResult> GetOrderCode(Guid orderId)
   {
@@ -83,7 +83,7 @@ public class OrderController : ControllerBase
   // Helper lấy userId từ token
   private string GetUserId()
   {
-    return "a2ad953e-1482-4cf2-9b94-41c88aeb90e3";
+    return "a8a9b907-81a6-41c9-90ff-eb2158c52044";
     // return Guid.Parse(User.FindFirst("sub")?.Value ?? Guid.Empty.ToString());
   }
 }

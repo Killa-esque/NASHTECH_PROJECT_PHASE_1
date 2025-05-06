@@ -23,7 +23,6 @@ using Polly;
 using Polly.Extensions.Http;
 using Ecommerce.Application.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
-using OpenIddict.Validation.SystemNetHttp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,11 +98,13 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
 builder.Services.AddTransient(typeof(PagedResultConverter<,>), typeof(PagedResultConverter<,>));
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

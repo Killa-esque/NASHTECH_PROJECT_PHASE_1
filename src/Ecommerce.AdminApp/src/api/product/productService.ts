@@ -1,63 +1,107 @@
-import { API_URLS } from "../apiUrls";
+import { ICreateProduct, IProduct, ISetFeaturedRequest, IUpdateProduct } from "@/types/types";
 import api from "../axiosConfig";
-import {
-  CreateProductDto,
-  ProductListResponseSchema,
-  ProductResponseDto,
-  ProductSingleResponseSchema,
-  UpdateProductDto,
-} from "./productTypes";
+import { API_URLS } from "../apiUrls";
 
 export const productService = {
-  getProducts: async (): Promise<ProductResponseDto[]> => {
-    const response = await api.get(API_URLS.PRODUCT.BASE);
-    const validatedResponse = ProductListResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+  getAll: async (
+    pageIndex: number = 1,
+    pageSize: number = 10
+  ): Promise<HttpResponse<PagedResult<IProduct>>> => {
+    try {
+      const response = await api.get(API_URLS.PRODUCT.BASE, {
+        params: { pageIndex, pageSize },
+      });
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to fetch products" };
     }
-    return validatedResponse.data.items;
   },
-  createProduct: async (
-    product: CreateProductDto
-  ): Promise<ProductResponseDto> => {
-    const response = await api.post(API_URLS.PRODUCT.BASE, product);
-    const validatedResponse = ProductSingleResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+
+  getById: async (id: string): Promise<HttpResponse<IProduct>> => {
+    try {
+      const response = await api.get(API_URLS.PRODUCT.BY_ID(id));
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to fetch product" };
     }
-    return validatedResponse.data;
   },
-  getProductById: async (id: string): Promise<ProductResponseDto> => {
-    const response = await api.get(API_URLS.PRODUCT.BY_ID(id));
-    const validatedResponse = ProductSingleResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+
+  create: async (product: ICreateProduct): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.post(API_URLS.PRODUCT.BASE, product);
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to create product" };
     }
-    return validatedResponse.data;
   },
-  updateProduct: async (
+
+  update: async (
     id: string,
-    product: UpdateProductDto
-  ): Promise<ProductResponseDto> => {
-    const response = await api.put(API_URLS.PRODUCT.BY_ID(id), product);
-    const validatedResponse = ProductSingleResponseSchema.parse(response.data);
-    if (!validatedResponse.status) {
-      throw new Error(
-        validatedResponse.message ?? "An unknown error occurred."
-      );
+    product: IUpdateProduct
+  ): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.put(API_URLS.PRODUCT.BY_ID(id), product);
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to update product" };
     }
-    return validatedResponse.data;
   },
-  deleteProduct: async (id: string): Promise<void> => {
-    await api.delete(API_URLS.PRODUCT.BY_ID(id));
+
+  delete: async (id: string): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.delete(API_URLS.PRODUCT.BY_ID(id));
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to delete product" };
+    }
   },
-  setFeatured: async (id: string, isFeatured: boolean): Promise<void> => {
-    await api.patch(API_URLS.PRODUCT.SET_FEATURED(id), { isFeatured });
+
+  setFeatured: async (
+    id: string,
+    request: ISetFeaturedRequest
+  ): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.patch(
+        API_URLS.PRODUCT.SET_FEATURED(id),
+        request
+      );
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to update featured status" };
+    }
+  },
+
+  uploadImages: async (
+    id: string,
+    files: File[]
+  ): Promise<HttpResponse<string>> => {
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("files", file));
+      const response = await api.post(
+        `/api/admin/products/${id}/images`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to upload images" };
+    }
+  },
+
+  deleteImage: async (
+    id: string,
+    imageUrl: string
+  ): Promise<HttpResponse<string>> => {
+    try {
+      const response = await api.delete(`/api/admin/products/${id}/images`, {
+        params: { imageUrl },
+      });
+      return response.data;
+    } catch (error) {
+      return { status: false, error: "Failed to delete image" };
+    }
   },
 };

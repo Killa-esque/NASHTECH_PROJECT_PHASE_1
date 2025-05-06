@@ -18,4 +18,10 @@ export const API_URLS = {
     BY_ID: (id: string) => `/api/admin/products/${id}`,
     SET_FEATURED: (id: string) => `/api/admin/products/${id}/set-featured`,
   },
+
+  //Customer Endpoints
+  CUSTOMER: {
+    BASE: "/api/users",
+    BY_ID: (id: string) => `/api/users/${id}`,
+  },
 };

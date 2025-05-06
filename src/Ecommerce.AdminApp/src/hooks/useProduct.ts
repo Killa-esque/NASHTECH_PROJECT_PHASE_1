@@ -1,112 +1,127 @@
-// src/api/product/useProduct.ts
 import { productService } from "@/api/product/productService";
 import {
-  CreateProductDto,
-  ProductResponseDto,
-  UpdateProductDto,
-} from "@/api/product/productTypes";
+  ICreateProduct,
+  IProduct,
+  ISetFeaturedRequest,
+  IUpdateProduct,
+} from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { message } from "antd";
 
-// Query keys cho caching
-const PRODUCT_QUERY_KEYS = {
-  all: ["products"] as const,
-  byId: (id: string) => ["products", id] as const,
-};
-
-// Hook để lấy danh sách products
-export const useGetProducts = () => {
-  return useQuery<ProductResponseDto[], Error>({
-    queryKey: PRODUCT_QUERY_KEYS.all,
-    queryFn: productService.getProducts,
-    retry: (failureCount, error) => {
-      // Retry tối đa 2 lần, trừ khi lỗi là 401 (xử lý bởi axios interceptor)
-      if (failureCount >= 2 || (error as any).response?.status === 401) {
-        return false;
-      }
-      return true;
-    },
-  });
-};
-
-// Hook để lấy product theo ID
-export const useGetProductById = (id: string) => {
-  return useQuery<ProductResponseDto, Error>({
-    queryKey: PRODUCT_QUERY_KEYS.byId(id),
-    queryFn: () => productService.getProductById(id),
-    enabled: !!id,
-    retry: (failureCount, error) => {
-      if (failureCount >= 2 || (error as any).response?.status === 401) {
-        return false;
-      }
-      return true;
-    },
-  });
-};
-
-// Hook để tạo product mới
-export const useCreateProduct = () => {
+export const useProduct = () => {
   const queryClient = useQueryClient();
-  return useMutation<ProductResponseDto, Error, CreateProductDto>({
-    mutationFn: productService.createProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEYS.all });
-      message.success("Product created successfully");
-    },
-    onError: (error) => {
-      message.error("Failed to create product: " + error.message);
-    },
-  });
-};
 
-// Hook để cập nhật product
-export const useUpdateProduct = () => {
-  const queryClient = useQueryClient();
-  return useMutation<
-    ProductResponseDto,
-    Error,
-    { id: string; data: UpdateProductDto }
-  >({
-    mutationFn: ({ id, data }) => productService.updateProduct(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEYS.all });
-      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEYS.byId(id) });
-      message.success("Product updated successfully");
-    },
-    onError: (error) => {
-      message.error("Failed to update product: " + error.message);
-    },
-  });
-};
+  // Fetch all products
+  const useProducts = (pageIndex: number = 1, pageSize: number = 10) =>
+    useQuery<PagedResult<IProduct>, Error>({
+      queryKey: ["products", pageIndex, pageSize],
+      queryFn: async () => {
+        const response = await productService.getAll(pageIndex, pageSize);
+        if (!response.status || !response.data) {
+          throw new Error(response.error || "Failed to fetch products");
+        }
+        return response.data;
+      },
+    });
 
-// Hook để xóa product
-export const useDeleteProduct = () => {
-  const queryClient = useQueryClient();
-  return useMutation<void, Error, string>({
-    mutationFn: productService.deleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEYS.all });
-      message.success("Product deleted successfully");
-    },
-    onError: (error) => {
-      message.error("Failed to delete product: " + error.message);
-    },
-  });
-};
+  // Fetch product by ID
+  const useProductById = (id: string) =>
+    useQuery<IProduct, Error>({
+      queryKey: ["product", id],
+      queryFn: async () => {
+        const response = await productService.getById(id);
+        if (!response.status || !response.data) {
+          throw new Error(response.error || "Failed to fetch product");
+        }
+        return response.data;
+      },
+      enabled: !!id,
+    });
 
-// Hook để set featured cho product
-export const useSetProductFeatured = () => {
-  const queryClient = useQueryClient();
-  return useMutation<void, Error, { id: string; isFeatured: boolean }>({
-    mutationFn: ({ id, isFeatured }) =>
-      productService.setFeatured(id, isFeatured),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEYS.all });
-      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEYS.byId(id) });
-      message.success("Product featured status updated");
-    },
-    onError: (error) => {
-      message.error("Failed to update featured status: " + error.message);
-    },
-  });
+  // Create product
+  const useCreateProduct = () =>
+    useMutation<HttpResponse<string>, Error, ICreateProduct>({
+      mutationFn: productService.create,
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
+      },
+    });
+
+  // Update product
+  const useUpdateProduct = () =>
+    useMutation<
+      HttpResponse<string>,
+      Error,
+      { id: string; data: IUpdateProduct }
+    >({
+      mutationFn: ({ id, data }) => productService.update(id, data),
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
+      },
+    });
+
+  // Delete product
+  const useDeleteProduct = () =>
+    useMutation<HttpResponse<string>, Error, string>({
+      mutationFn: productService.delete,
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
+      },
+    });
+
+  // Set featured status
+  const useSetFeatured = () =>
+    useMutation<
+      HttpResponse<string>,
+      Error,
+      { id: string; request: ISetFeaturedRequest }
+    >({
+      mutationFn: ({ id, request }) => productService.setFeatured(id, request),
+      onSuccess: (response) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
+      },
+    });
+
+  // Upload product images
+  const useUploadProductImages = () =>
+    useMutation<HttpResponse<string>, Error, { id: string; files: File[] }>({
+      mutationFn: ({ id, files }) => productService.uploadImages(id, files),
+      onSuccess: (response, { id }) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          queryClient.invalidateQueries({ queryKey: ["product", id] });
+        }
+      },
+    });
+
+  // Delete product image
+  const useDeleteProductImage = () =>
+    useMutation<HttpResponse<string>, Error, { id: string; imageUrl: string }>({
+      mutationFn: ({ id, imageUrl }) =>
+        productService.deleteImage(id, imageUrl),
+      onSuccess: (response, { id }) => {
+        if (response.status) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          queryClient.invalidateQueries({ queryKey: ["product", id] });
+        }
+      },
+    });
+
+  return {
+    useProducts,
+    useProductById,
+    useCreateProduct,
+    useUpdateProduct,
+    useDeleteProduct,
+    useSetFeatured,
+    useUploadProductImages,
+    useDeleteProductImage,
+  };
 };

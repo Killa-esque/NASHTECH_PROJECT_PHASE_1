@@ -40,7 +40,7 @@ public class UserController : ControllerBase
     try
     {
       _logger.LogInformation("Get user by ID: {Id}", id);
-      var result = await _userService.GetByIdAsync(id);
+      var result = await _userService.GetProfileAsync(id);
       return result.Status ? Ok(result) : result.Message.Contains("not found") ? NotFound(result) : BadRequest(result);
     }
     catch (Exception ex)

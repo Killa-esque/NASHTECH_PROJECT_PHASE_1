@@ -16,5 +16,6 @@ public class ProductDto
   public string ExpirationDate { get; set; } // Ví dụ: "3 ngày kể từ ngày sản xuất"
   public string StorageInstructions { get; set; } // Ví dụ: "Để mát (2-6°C)"
   public string Allergens { get; set; } // Ví dụ: "Chứa gluten và sữa"
+  public DateTime createDate { get; set; } // Ngày tạo sản phẩm
 }
 

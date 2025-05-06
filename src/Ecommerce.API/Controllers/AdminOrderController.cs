@@ -19,10 +19,12 @@ public class AdminOrderController : ControllerBase
     _mapper = mapper;
   }
 
+  // 1. Lấy danh sách đơn hàng
+
   [HttpGet]
-  public async Task<IActionResult> GetAllOrders([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+  public async Task<IActionResult> GetAllOrdersByCustomerId([FromQuery] string customerId, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
   {
-    var result = await _orderService.GetAllOrdersAsync(pageIndex, pageSize); // Bạn cần thêm service method này nếu chưa có
+    var result = await _orderService.GetOrdersByCustomerIdAsync(customerId, pageIndex, pageSize); // Bạn cần thêm service method này nếu chưa có
 
     if (result.IsSuccess)
       return Ok(ApiResponse<PagedResult<OrderDto>>.Success(result.Data, "Orders retrieved successfully."));
@@ -50,4 +52,19 @@ public class AdminOrderController : ControllerBase
       return Ok(ApiResponse<string>.Success(result.Message));
     return BadRequest(ApiResponse<string>.Fail(result.Error));
   }
+
+  // 4. Hủy đơn hàng
+  [HttpPost("{orderId}/cancel")]
+  public async Task<IActionResult> CancelOrder(Guid orderId)
+  {
+    Console.WriteLine($"GetOrderDetail: {orderId}");
+
+    var result = await _orderService.CancelOrderAsync(orderId);
+
+    if (result.IsSuccess)
+      return Ok(ApiResponse<string>.Success(null, result.Message));
+    return BadRequest(ApiResponse<string>.Fail(result.Error));
+  }
+
+
 }

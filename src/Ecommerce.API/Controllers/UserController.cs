@@ -15,9 +15,11 @@ public class UserController : ControllerBase
   private readonly HttpClient _httpClient;
   private readonly ISupabaseStorageService _storageService;
   private readonly ILogger<UserController> _logger;
+  private readonly IOrderService _orderService;
 
-  public UserController(IHttpClientFactory httpClientFactory, ISupabaseStorageService storageService, ILogger<UserController> logger)
+  public UserController(IHttpClientFactory httpClientFactory, ISupabaseStorageService storageService, ILogger<UserController> logger, IOrderService orderService)
   {
+    _orderService = orderService;
     _logger = logger;
     _httpClient = httpClientFactory.CreateClient("AuthServerClient");
     _storageService = storageService;
@@ -127,6 +129,16 @@ public class UserController : ControllerBase
   public async Task<IActionResult> Delete(string id)
   {
     await AddAuthorizationHeaderAsync();
+
+    var deleteOrdersResponse = await _orderService.DeleteOrdersByUserIdAsync(id);
+
+    if (!deleteOrdersResponse.IsSuccess)
+    {
+      _logger.LogWarning("Failed to delete orders for user {UserId}: {Message}", id, deleteOrdersResponse.Error);
+      return BadRequest(ApiResponse<string>.Fail($"Failed to delete orders: {deleteOrdersResponse.Error}"));
+    }
+
+
     var response = await _httpClient.DeleteAsync($"api/users/{id}");
     var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
     return response.IsSuccessStatusCode && result?.Status == true ? Ok(result) : StatusCode((int)response.StatusCode, result);
