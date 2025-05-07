@@ -10,77 +10,89 @@
         <h1 class="text-3xl font-bold text-yellow-900 dark:text-yellow-300 mb-10">🛒 Giỏ hàng của bạn</h1>
 
         <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-            @if (!Model.Any())
-            {
-                <p class="text-yellow-800 dark:text-yellow-100">Hiện tại chưa có sản phẩm nào trong giỏ hàng.</p>
-            }
-            else
-            {
-                <table class="table w-full" id="cartTable">
-                    <thead>
-                        <tr class="text-yellow-900 dark:text-yellow-300 text-sm">
-                            <th></th>
-                            <th class="text-left">Sản phẩm</th>
-                            <th>Số lượng</th>
-                            <th>Đơn giá</th>
-                            <th>Tạm tính</th>
-                            <th></th>
+
+
+            <table class="table w-full" id="cartTable">
+                <thead>
+                    <tr class="text-yellow-900 dark:text-yellow-300 text-sm">
+                        <th></th>
+                        <th class="text-left">Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Tạm tính</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="text-yellow-800 dark:text-yellow-100">
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-yellow-800 dark:text-yellow-100">
+                                Hiện tại chưa có sản phẩm nào trong giỏ hàng.
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody class="text-yellow-800 dark:text-yellow-100">
+                    }
+                    else
+                    {
+
                         @for (int i = 0; i < Model.Count; i++)
                         {
                             <tr class="border-t border-amber-200 dark:border-gray-600" data-product-id="@Model[i].ProductId">
                                 <td>
-                                    <img src="@Model[i].ImageUrl" alt="@Model[i].ProductName" class="w-14 h-14 object-cover rounded" />
+                                    <img src="@Model[i].ImageUrl" alt="@Model[i].ProductName"
+                                        class="w-14 h-14 object-cover rounded" />
                                 </td>
                                 <td>@Model[i].ProductName</td>
                                 <td>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="updateQuantity(@i, -1)"
-                                                class="btn btn-sm rounded bg-amber-100 text-yellow-900 dark:bg-gray-700 dark:text-yellow-200">-</button>
+                                            class="btn btn-sm rounded bg-amber-100 text-yellow-900 dark:bg-gray-700 dark:text-yellow-200 @(Model[i].Quantity <= 1 ? "disabled" : "")"
+                                            @(Model[i].Quantity <= 1 ? "disabled" : "")>-</button>
                                         <input type="number" id="qty-@i" value="@Model[i].Quantity" min="1"
-                                               class="input input-sm w-16 text-center bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-white border border-amber-200 dark:border-gray-600"
-                                               onchange="updateQuantityServer(@i, this.value)" />
+                                            class="input input-sm w-16 text-center bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-white border border-amber-200 dark:border-gray-600"
+                                            onchange="updateQuantityServer(@i, this.value)" />
                                         <button type="button" onclick="updateQuantity(@i, 1)"
-                                                class="btn btn-sm rounded bg-amber-100 text-yellow-900 dark:bg-gray-700 dark:text-yellow-200">+</button>
+                                            class="btn btn-sm rounded bg-amber-100 text-yellow-900 dark:bg-gray-700 dark:text-yellow-200">+</button>
                                     </div>
                                 </td>
                                 <td id="price-@i">@Model[i].Price.ToString("N0") $</td>
                                 <td id="total-@i">@((Model[i].Price * Model[i].Quantity).ToString("N0")) $</td>
                                 <td>
                                     <button type="button" onclick="removeFromCart('@Model[i].ProductId', @i)"
-    class="btn btn-xs bg-red-600 hover:bg-red-500 text-white rounded">❌</button>
+                                        class="btn btn-xs bg-red-600 hover:bg-red-500 text-white rounded">❌</button>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
+                    }
+                </tbody>
+            </table>
 
-                <!-- Notes + Total -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-                    <div>
-                        <label class="label">
-                            <span class="label-text text-yellow-900 dark:text-yellow-100 font-medium">📝 Ghi chú đơn hàng</span>
-                        </label>
-                        <textarea class="textarea textarea-bordered w-full bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100" rows="3"
-                                  placeholder="VD: Ghi tên người nhận lên bánh, ngày giao hàng, v.v."></textarea>
-                    </div>                </div>
-
-                <!-- Tổng tiền -->
-                <div class="divider my-8"></div>
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="text-yellow-900 dark:text-yellow-100 space-y-1 text-lg">
-                        <p class="font-semibold">Tổng cộng:
-                            <span class="text-xl font-bold" id="cartTotal">@total.ToString("N0") $</span>
-                        </p>
-                    </div>
-                    <a href="/Order/Index"
-                       class="btn bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg text-sm font-medium transition">
-                        ✅ Tiến hành đặt bánh
-                    </a>
+            <!-- Notes + Total -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+                <div>
+                    <label class="label">
+                        <span class="label-text text-yellow-900 dark:text-yellow-100 font-medium">📝 Ghi chú đơn
+                            hàng</span>
+                    </label>
+                    <textarea
+                        class="textarea textarea-bordered w-full bg-white dark:bg-gray-700 text-yellow-900 dark:text-yellow-100"
+                        rows="3" placeholder="VD: Ghi tên người nhận lên bánh, ngày giao hàng, v.v."></textarea>
                 </div>
-            }
+            </div>
+
+            <!-- Tổng tiền -->
+            <div class="divider my-8"></div>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-yellow-900 dark:text-yellow-100 space-y-1 text-lg">
+                    <p class="font-semibold">Tổng cộng:
+                        <span class="text-xl font-bold" id="cartTotal">@total.ToString("N0") $</span>
+                    </p>
+                </div>
+                <a href="/Order/Index"
+                    class="btn bg-yellow-800 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg text-sm font-medium transition">
+                    ✅ Tiến hành đặt bánh
+                </a>
+            </div>
         </div>
     </div>
 </section>
@@ -97,25 +109,52 @@
                 });
 
                 if (response.ok) {
-                    // Xóa dòng sản phẩm khỏi bảng
-                    const row = document.querySelector(`#cartTable tr:nth-child(${index + 1})`);
-                    row.remove();
+                    const result = await response.json();
+                    const items = result.items;
 
-                    // Kiểm tra nếu giỏ hàng trống
-                    const rows = document.querySelectorAll('#cartTable tbody tr');
-                    if (rows.length === 0) {
-                        document.getElementById('cartTable').innerHTML = `
+                    // Cập nhật lại bảng giỏ hàng
+                    const tbody = document.querySelector('#cartTable tbody');
+                    tbody.innerHTML = ''; // Xóa toàn bộ nội dung hiện tại
+
+                    if (items.length === 0) {
+                        tbody.innerHTML = `
                             <tr>
                                 <td colspan="6" class="text-center text-yellow-800 dark:text-yellow-100">
                                     Hiện tại chưa có sản phẩm nào trong giỏ hàng.
                                 </td>
-                            </tr>
-                        `;
+                            </tr>`;
+                    } else {
+                        items.forEach((item, i) => {
+                            tbody.innerHTML += `
+                                <tr class="border-t border-amber-200 dark:border-gray-600" data-product-id="${item.productId}">
+                                    <td>
+                                        <img src="${item.imageUrl}" alt="${item.productName}" class="w-14 h-14 object-cover rounded" />
+                                    </td>
+                                    <td>${item.productName}</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="updateQuantity(${i}, -1)"
+                                                    class="btn btn-sm rounded bg-amber-100 text-yellow-900 dark:bg-gray-700 dark:text-yellow-200 ${item.quantity <= 1 ? 'disabled' : ''}"
+                                                    ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                                            <input type="number" id="qty-${i}" value="${item.quantity}" min="1"
+                                                   class="input input-sm w-16 text-center bg-amber-50 dark:bg-gray-700 text-yellow-900 dark:text-white border border-amber-200 dark:border-gray-600"
+                                                   onchange="updateQuantityServer(${i}, this.value)" />
+                                            <button type="button" onclick="updateQuantity(${i}, 1)"
+                                                    class="btn btn-sm rounded bg-amber-100 text-yellow-900 dark:bg-gray-700 dark:text-yellow-200">+</button>
+                                        </div>
+                                    </td>
+                                    <td id="price-${i}">${item.price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} $</td>
+                                    <td id="total-${i}">${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} $</td>
+                                    <td>
+                                        <button type="button" onclick="removeFromCart('${item.productId}', ${i})"
+                                                class="btn btn-xs bg-red-600 hover:bg-red-500 text-white rounded">❌</button>
+                                    </td>
+                                </tr>`;
+                        });
                     }
 
                     // Cập nhật tổng tiền giỏ hàng
                     updateCartTotal();
-
                     showToast('Đã xóa sản phẩm khỏi giỏ hàng!', 'success');
                 } else {
                     const result = await response.json();
@@ -153,10 +192,11 @@
                     if (item) {
                         // Cập nhật số lượng và tổng tiền cho sản phẩm
                         document.getElementById(`qty-${index}`).value = item.quantity;
-                        document.getElementById(`total-${index}`).textContent = 
+                        document.getElementById(`total-${index}`).textContent =
                             (item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' $';
-                        
+
                         // Cập nhật tổng tiền giỏ hàng
+                        updateCartIcon();
                         updateCartTotal();
                     }
                 } else {
@@ -175,9 +215,9 @@
                 const value = parseFloat(elem.textContent.replace(/[^0-9.-]+/g, ''));
                 return sum + (isNaN(value) ? 0 : value);
             }, 0);
-            document.getElementById('cartTotal').textContent = 
+            document.getElementById('cartTotal').textContent =
                 total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' $';
         }
-        
+
     </script>
 }

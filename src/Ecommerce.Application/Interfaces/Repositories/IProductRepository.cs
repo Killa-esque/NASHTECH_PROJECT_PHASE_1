@@ -12,7 +12,7 @@ public interface IProductRepository
   Task<int> AddAsync(Product product);
   Task<int> UpdateAsync(Product product);
   Task<int> DeleteAsync(Guid id);
-  Task<bool> ExistsAsync(string name);
+  Task<bool> ExistsAsync(string name, Guid? id = null);
   Task<int> CountAsync();
   Task<int> CountByCategoryAsync(Guid categoryId);
   Task<int> CountFeaturedProductsAsync();

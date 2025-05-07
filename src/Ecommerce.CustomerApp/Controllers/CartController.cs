@@ -51,7 +51,8 @@ public class CartController : Controller
           i.ProductId,
           i.ProductName,
           i.Quantity,
-          i.Price
+          i.Price,
+          i.ImageUrl // Thêm ImageUrl
         })
       });
     }

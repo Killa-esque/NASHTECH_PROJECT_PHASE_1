@@ -8,11 +8,13 @@ import {
 import { IProduct } from "@/types/types";
 import { Pagination } from "antd";
 import dayjs from "dayjs";
+import { memo } from "react";
 
 interface ProductTableProps {
   data: IProduct[];
   onEdit: (product: IProduct) => void;
   onDelete: (product: IProduct) => void;
+  onSetFeatured: (product: IProduct, isFeatured: boolean) => void;
   pagination: {
     totalCount: number;
     pageIndex: number;
@@ -21,10 +23,11 @@ interface ProductTableProps {
   };
 }
 
-export default function ProductTable({
+function ProductTable({
   data,
   onEdit,
   onDelete,
+  onSetFeatured,
   pagination,
 }: ProductTableProps) {
   const { totalCount, pageIndex, pageSize, onPageChange } = pagination;
@@ -65,6 +68,12 @@ export default function ProductTable({
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Ngày tạo
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Nổi bật
                 </TableCell>
                 <TableCell
                   isHeader
@@ -116,15 +125,63 @@ export default function ProductTable({
                     {product.price.toLocaleString()}đ
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {product.createdAt
-                      ? dayjs(product.createdAt).format("DD/MM/YYYY")
+                    {product.createdDate
+                      ? dayjs(product.createdDate).format("DD/MM/YYYY")
                       : "N/A"}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-theme-sm text  text-start">
+                    <button
+                      onClick={() =>
+                        onSetFeatured(product, !product.isFeatured)
+                      }
+                      className={`flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-medium shadow-theme-xs ${
+                        product.isFeatured
+                          ? "border-green-300 bg-green-50 text-green-600 hover:bg-green-100 dark:border-green-700 dark:bg-green-900 dark:text-green-400 dark:hover:bg-green-800"
+                          : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
+                      }`}
+                    >
+                      {product.isFeatured ? (
+                        <>
+                          <svg
+                            className="fill-current"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                            />
+                          </svg>
+                          Đang nổi bật
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            className="fill-current"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                            />
+                          </svg>
+                          Đặt nổi bật
+                        </>
+                      )}
+                    </button>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-theme-sm text-start">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => onEdit(product)}
-                        className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                        className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-F400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
                       >
                         <svg
                           className="fill-current"
@@ -182,3 +239,5 @@ export default function ProductTable({
     </div>
   );
 }
+
+export default memo(ProductTable);

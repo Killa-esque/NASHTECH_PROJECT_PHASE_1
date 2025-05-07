@@ -74,8 +74,8 @@ export default function CategoryTable({
                     {category.description}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {category.createdAt
-                      ? dayjs(category.createdAt).format("DD/MM/YYYY")
+                    {category.createdDate
+                      ? dayjs(category.createdDate).format("DD/MM/YYYY")
                       : "N/A"}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-theme-sm text-start">

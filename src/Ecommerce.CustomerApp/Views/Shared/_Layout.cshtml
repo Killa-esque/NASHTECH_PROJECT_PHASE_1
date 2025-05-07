@@ -65,8 +65,8 @@
       const toast = document.createElement('div');
       toast.className = `alert ${colors[type]} shadow-lg`;
       toast.innerHTML = `
-      <span>${message}</span>
-    `;
+            <span>${message}</span>
+        `;
 
       const container = document.getElementById('toast-container');
       container.appendChild(toast);
@@ -86,27 +86,40 @@
         });
 
         const result = await response.json();
-
-        console.log(result);
         if (result.success) {
           // Cập nhật số lượng sản phẩm
-          document.getElementById('cartCounter').innerText = result.totalItems;
+          const counter = document.getElementById('cartCounter');
+          if (counter) {
+            counter.textContent = result.totalItems || 0;
+          }
+
+          // Cập nhật tóm tắt giỏ hàng
+          const summary = document.getElementById('cartSummary');
+          if (summary) {
+            summary.textContent = `${result.totalItems || 0} sản phẩm`;
+          }
 
           // Cập nhật danh sách sản phẩm trong dropdown
-          const miniCartItems = document.getElementById('miniCartItems');
-          const cartSummary = document.getElementById('cartSummary');
-          miniCartItems.innerHTML = ''; // Xóa nội dung cũ
-          cartSummary.innerText = `${result.totalItems} sản phẩm`;
-
-          result.items.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'py-2 flex justify-between items-center';
-            itemElement.innerHTML = `
-          <span class="text-sm text-yellow-900 dark:text-yellow-300">${item.productName}</span>
-          <span class="text-sm text-gray-500 dark:text-gray-400">x${item.quantity}</span>
-        `;
-            miniCartItems.appendChild(itemElement);
-          });
+          const miniCart = document.getElementById('miniCartItems');
+          if (miniCart) {
+            miniCart.innerHTML = '';
+            if (result.items && result.items.length > 0) {
+              result.items.forEach(item => {
+                const itemHtml = `
+                                <div class="py-2 flex gap-3 items-center">
+                                    <img src="${item.imageUrl || '/img/mini-cake.jpg'}" class="w-12 h-12 rounded object-cover" />
+                                    <div class="flex-1 text-sm text-yellow-800 dark:text-yellow-100">
+                                        <p>${item.productName} x ${item.quantity}</p>
+                                        <p class="text-xs">${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</p>
+                                    </div>
+                                </div>
+                            `;
+                miniCart.innerHTML += itemHtml;
+              });
+            } else {
+              miniCart.innerHTML = '<p class="text-sm text-yellow-800 dark:text-yellow-100">Giỏ hàng trống</p>';
+            }
+          }
         } else {
           console.error('Failed to fetch cart summary:', result.message);
         }
@@ -114,8 +127,32 @@
         console.error('Error updating cart icon:', error);
       }
     }
+
+    async function addToCart(productId, quantity) {
+      try {
+        const response = await fetch('/Cart/AddToCart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ productId, quantity: parseInt(quantity) })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          showToast(`Đã thêm sản phẩm vào giỏ hàng! Tổng số lượng: ${result.totalItems}`, 'success');
+          updateCartIcon(); // Cập nhật CartIcon sau khi thêm sản phẩm
+        } else {
+          showToast(result.message, 'error');
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        showToast('Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng', 'error');
+      }
+    }
   </script>
-  
+
 </body>
 
 </html>

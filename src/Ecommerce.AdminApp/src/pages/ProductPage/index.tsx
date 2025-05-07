@@ -10,7 +10,7 @@ import { useModal } from "@/hooks/useModal";
 import { useProduct } from "@/hooks/useProduct";
 import { ICreateProduct, IProduct, IUpdateProduct } from "@/types/types";
 import { message } from "antd";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 export default function Product() {
@@ -21,6 +21,7 @@ export default function Product() {
     useCreateProduct,
     useUpdateProduct,
     useDeleteProduct,
+    useSetFeatured,
   } = useProduct();
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -33,6 +34,7 @@ export default function Product() {
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const deleteProductMutation = useDeleteProduct();
+  const setFeaturedMutation = useSetFeatured();
 
   const createModal = useModal();
   const editModal = useModal();
@@ -57,47 +59,82 @@ export default function Product() {
     }
   }, [products, isLoading, isFetching, error]);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setSelectedProductId(null);
     createModal.openModal();
-  };
+  }, [createModal]);
 
-  const handleEdit = (product: IProduct) => {
-    setSelectedProductId(product.id);
-    editModal.openModal();
-  };
+  const handleEdit = useCallback(
+    (product: IProduct) => {
+      setSelectedProductId(product.id);
+      editModal.openModal();
+    },
+    [editModal]
+  );
 
-  const handleDelete = (product: IProduct) => {
-    setSelectedProductId(product.id);
-    deleteModal.openModal();
-  };
+  const handleDelete = useCallback(
+    (product: IProduct) => {
+      setSelectedProductId(product.id);
+      deleteModal.openModal();
+    },
+    [deleteModal]
+  );
 
-  const handleCreateSubmit = async (data: ICreateProduct) => {
-    try {
-      const response = await createProductMutation.mutateAsync(data);
-      createModal.closeModal();
-      message.success("Product created successfully");
-      return response.data; // Return the product ID for image upload
-    } catch (err) {
-      console.error("Failed to create product:", err);
-      message.error("Failed to create product");
-      throw err;
-    }
-  };
+  const handleSetFeatured = useCallback(
+    async (product: IProduct, isFeatured: boolean) => {
+      try {
+        await setFeaturedMutation.mutateAsync({
+          id: product.id,
+          request: { isFeatured },
+        });
+        message.success(
+          isFeatured
+            ? "Đặt sản phẩm nổi bật thành công"
+            : "Hủy trạng thái nổi bật thành công"
+        );
+      } catch (err) {
+        console.error("Failed to set featured status:", err);
+        message.error("Không thể cập nhật trạng thái nổi bật");
+      }
+    },
+    [setFeaturedMutation]
+  );
 
-  const handleEditSubmit = async (data: IUpdateProduct) => {
-    if (!selectedProductId) return;
-    try {
-      await updateProductMutation.mutateAsync({ id: selectedProductId, data });
-      editModal.closeModal();
-      message.success("Product updated successfully");
-    } catch (err) {
-      console.error("Failed to update product:", err);
-      message.error("Failed to update product");
-    }
-  };
+  const handleCreateSubmit = useCallback(
+    async (data: ICreateProduct) => {
+      try {
+        const response = await createProductMutation.mutateAsync(data);
+        createModal.closeModal();
+        message.success("Product created successfully");
+        return response.data; // Return the product ID for image upload
+      } catch (err) {
+        console.error("Failed to create product:", err);
+        message.error("Failed to create product");
+        throw err;
+      }
+    },
+    [createProductMutation, createModal]
+  );
 
-  const handleDeleteConfirm = async () => {
+  const handleEditSubmit = useCallback(
+    async (data: IUpdateProduct) => {
+      if (!selectedProductId) return;
+      try {
+        await updateProductMutation.mutateAsync({
+          id: selectedProductId,
+          data,
+        });
+        editModal.closeModal();
+        message.success("Product updated successfully");
+      } catch (err) {
+        console.error("Failed to update product:", err);
+        message.error("Failed to update product");
+      }
+    },
+    [updateProductMutation, editModal, selectedProductId]
+  );
+
+  const handleDeleteConfirm = useCallback(async () => {
     if (!selectedProductId) return;
     try {
       await deleteProductMutation.mutateAsync(selectedProductId);
@@ -108,12 +145,15 @@ export default function Product() {
       console.error("Failed to delete product:", err);
       message.error("Failed to delete product");
     }
-  };
+  }, [deleteProductMutation, deleteModal, selectedProductId]);
 
-  const handlePageChange = (newPage: number, newPageSize: number) => {
-    setPageIndex(newPage);
-    setPageSize(newPageSize);
-  };
+  const handlePageChange = useCallback(
+    (newPage: number, newPageSize: number) => {
+      setPageIndex(newPage);
+      setPageSize(newPageSize);
+    },
+    []
+  );
 
   if (authLoading || isLoading || isFetching) {
     return <div>Loading...</div>;
@@ -157,6 +197,7 @@ export default function Product() {
               data={products}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onSetFeatured={handleSetFeatured}
               pagination={{
                 totalCount,
                 pageIndex,

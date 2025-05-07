@@ -91,33 +91,3 @@
         }
     </div>
 </section>
-
-
-@section Scripts {
-    <script>
-        async function addToCart(productId, quantity) {
-            try {
-                const response = await fetch('/Cart/AddToCart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({ productId, quantity })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    showToast(`Đã thêm sản phẩm vào giỏ hàng! : Tổng số lượng: ${result.totalItems}`, 'success');
-                    // Cập nhật giao diện giỏ hàng nếu cần
-                    updateCartIcon();
-                } else {
-                    showToast(result.message, 'error');
-                }
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                showToast('Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng', 'error');
-            }
-        }
-    </script>
-}

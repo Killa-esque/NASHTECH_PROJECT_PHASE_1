@@ -45,6 +45,6 @@ public class RatingController : ControllerBase
 
   private string GetUserId()
   {
-    return "a2ad953e-1482-4cf2-9b94-41c88aeb90e3";
+    return "4b879495-4cc3-42e0-a5da-1bafa9aa8e05";
   }
 }

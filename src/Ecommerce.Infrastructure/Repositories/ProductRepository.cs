@@ -124,14 +124,14 @@ public class ProductRepository : IProductRepository
     _context.Products.Remove(product);
     return _context.SaveChangesAsync();
   }
-  public Task<bool> ExistsAsync(string name)
+  public async Task<bool> ExistsAsync(string name, Guid? id = null)
   {
     if (string.IsNullOrWhiteSpace(name))
-    {
       throw new ArgumentException("Product name cannot be null or empty.", nameof(name));
-    }
 
-    return _context.Products.AsNoTracking().AnyAsync(p => p.Name == name);
+    return await _context.Products
+        .AsNoTracking()
+        .AnyAsync(p => p.Name == name && (id == null || p.Id != id));
   }
   public Task<int> CountAsync()
   {

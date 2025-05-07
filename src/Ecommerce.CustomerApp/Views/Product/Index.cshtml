@@ -99,7 +99,7 @@
 
 @section Scripts {
   <script>
-    async function addToCart(productId, quantity) {
+    @* async function addToCart(productId, quantity) {
       try {
         const response = await fetch('/Cart/AddToCart', {
           method: 'POST',
@@ -122,6 +122,6 @@
         console.error('Error adding to cart:', error);
         showToast('Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng', 'error');
       }
-    }
+    } *@
   </script>
 }

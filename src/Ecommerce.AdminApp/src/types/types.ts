@@ -3,8 +3,7 @@ export interface ICategory {
   id: string;
   name: string;
   description: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdDate?: string;
 }
 
 export interface IProduct {
@@ -19,8 +18,9 @@ export interface IProduct {
   ingredients?: string;
   expirationDate?: string;
   storageInstructions?: string;
+  isFeatured?: boolean;
   allergens?: string;
-  createdAt?: string;
+  createdDate?: string;
   updatedAt?: string;
 }
 

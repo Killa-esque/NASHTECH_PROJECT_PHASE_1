@@ -7,9 +7,14 @@ import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
 import { useCategory } from "@/hooks/useCategory";
 import { useProduct } from "@/hooks/useProduct";
-import { ICategory, ICreateProduct, IProduct, IUpdateProduct } from "@/types/types";
+import {
+  ICategory,
+  ICreateProduct,
+  IProduct,
+  IUpdateProduct,
+} from "@/types/types";
 import { message } from "antd";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 
 interface ProductModalProps {
@@ -39,7 +44,7 @@ const ProductFormSchema = z.object({
   allergens: z.string().optional(),
 });
 
-export default function ProductModal({
+function ProductModal({
   isOpen,
   onClose,
   isEdit = false,
@@ -100,26 +105,32 @@ export default function ProductModal({
     setErrors({});
   }, [isEdit, initialData, categories]);
 
-  const handleFilesChange = (files: File[]) => {
+  const handleFilesChange = useCallback((files: File[]) => {
     setNewFiles((prev) => [...prev, ...files]);
-  };
+  }, []);
 
-  const handleRemoveNewFile = (index: number) => {
+  const handleRemoveNewFile = useCallback((index: number) => {
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
-  };
+  }, []);
 
-  const handleRemoveExistingImage = async (imageUrl: string) => {
-    if (isEdit && initialData?.id) {
-      try {
-        await deleteImageMutation.mutateAsync({ id: initialData.id, imageUrl });
-        message.success("Image deleted successfully");
-      } catch (err) {
-        message.error("Failed to delete image");
+  const handleRemoveExistingImage = useCallback(
+    async (imageUrl: string) => {
+      if (isEdit && initialData?.id) {
+        try {
+          await deleteImageMutation.mutateAsync({
+            id: initialData.id,
+            imageUrl,
+          });
+          message.success("Image deleted successfully");
+        } catch (err) {
+          message.error("Failed to delete image");
+        }
       }
-    }
-  };
+    },
+    [isEdit, initialData?.id, deleteImageMutation]
+  );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const data: ICreateProduct | IUpdateProduct = {
       name,
       description,
@@ -171,7 +182,25 @@ export default function ProductModal({
     } catch (err) {
       message.error("Failed to save product");
     }
-  };
+  }, [
+    name,
+    description,
+    price,
+    categoryId,
+    stock,
+    weight,
+    ingredients,
+    expirationDate,
+    storageInstructions,
+    allergens,
+    newFiles,
+    isEdit,
+    initialData?.id,
+    onEdit,
+    onCreate,
+    uploadImagesMutation,
+    onClose,
+  ]);
 
   const categoryOptions = categories.items.map((category: ICategory) => ({
     value: category.id,
@@ -470,3 +499,5 @@ export default function ProductModal({
     </Modal>
   );
 }
+
+export default memo(ProductModal);

@@ -138,11 +138,28 @@ public class ProductService : IProductService
       return Result.Failure("Product cannot be null.");
 
     var product = _mapper.Map<Product>(productDto);
-    var exists = await _productRepository.ExistsAsync(product.Name);
-    if (!exists)
+    var exists = await _productRepository.ExistsAsync(product.Name, product.Id);
+    if (exists)
+      return Result.Failure("Product with this name already exists.");
+
+    var currentProduct = await _productRepository.GetByIdAsync(product.Id);
+    if (currentProduct == null)
       return Result.Failure("Product not found.");
 
-    var affectedRows = await _productRepository.UpdateAsync(product);
+    // Cập nhật các trường
+    currentProduct.Name = product.Name;
+    currentProduct.Description = product.Description;
+    currentProduct.Price = product.Price;
+    currentProduct.CategoryId = product.CategoryId;
+    currentProduct.Stock = product.Stock;
+    currentProduct.Weight = product.Weight;
+    currentProduct.Ingredients = product.Ingredients;
+    currentProduct.ExpirationDate = product.ExpirationDate;
+    currentProduct.StorageInstructions = product.StorageInstructions;
+    currentProduct.Allergens = product.Allergens;
+    currentProduct.UpdatedDate = DateTime.UtcNow;
+
+    var affectedRows = await _productRepository.UpdateAsync(currentProduct);
     if (affectedRows == 0)
       return Result.Failure("Failed to update product.");
 

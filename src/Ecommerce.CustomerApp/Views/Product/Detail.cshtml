@@ -57,7 +57,7 @@
       </p>
 
       <div class="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
-        @Model.Price.ToString("N0") ₫
+        @Model.Price.ToString("N0") $
       </div>
 
       <div class="form-control max-w-xs">
@@ -79,7 +79,7 @@
           class="btn flex-1 bg-yellow-800 hover:bg-yellow-700 text-white transition">
           🛒 Thêm vào giỏ
         </button>
-        <a href="/Order/Create" class="btn flex-1 bg-red-600 hover:bg-red-500 text-white transition">
+        <a href="/Cart" class="btn flex-1 bg-red-600 hover:bg-red-500 text-white transition">
           🧾 Đặt bánh ngay
         </a>
       </div>
@@ -126,9 +126,8 @@
                 <div class="rating rating-sm">
                   @for (int i = 1; i <= 5; i++)
                   {
-                    <input type="radio" class="mask mask-star-2 bg-yellow-500" name="rating-@rating.Id" @(i ==
-                                                                                                                          rating.RatingValue ? "checked" : "") disabled />
-                                }
+                    <input type="radio" class="mask mask-star-2 bg-yellow-500" name="rating-@rating.Id" @(i == rating.RatingValue ? "checked" : "") disabled />
+                  }
                 </div>
               </div>
               <p class="text-sm text-amber-800 dark:text-yellow-200 mb-2">@rating.Comment</p>
@@ -140,9 +139,10 @@
     </div>
 
     <!-- Gửi đánh giá mới -->
+    <!-- Trong Detail.cshtml, phần gửi đánh giá -->
     @if (User.Identity?.IsAuthenticated == true)
     {
-      <form asp-action="Rate" method="post" class="space-y-4">
+      <form asp-action="Rate" method="post" class="space-y-4" onsubmit="return validateRatingForm()">
         <input type="hidden" name="ProductId" value="@Model.Id" />
         <div class="form-control max-w-md">
           <label class="label">
@@ -151,9 +151,12 @@
           <div class="rating rating-lg">
             @for (int i = 1; i <= 5; i++)
             {
-              <input type="radio" name="RatingValue" value="@i" class="mask mask-star-2 bg-yellow-500" />
+              <input type="radio" name="RatingValue" value="@i" class="mask mask-star-2 bg-yellow-500" required />
             }
           </div>
+          <label class="label">
+            <span class="label-text-alt text-red-600 hidden" id="ratingError">Vui lòng chọn số sao!</span>
+          </label>
         </div>
         <div class="form-control max-w-md">
           <label class="label">
@@ -180,9 +183,8 @@
 </section>
 
 @section Scripts {
-  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
   <script>
-    const swiper = new Swiper('.mySwiper', {
+    const swiper2 = new Swiper('.mySwiper', {
       slidesPerView: 1,
       spaceBetween: 16,
       breakpoints: {
@@ -194,33 +196,26 @@
 
     function updateDetailQuantity(change) {
       const qtyInput = document.getElementById('detailQuantity');
+      const minusButton = document.getElementById('minusButton');
       let currentVal = parseInt(qtyInput.value) || 1;
       const newVal = Math.max(1, currentVal + change);
       qtyInput.value = newVal;
+      minusButton.disabled = newVal <= 1; // Vô hiệu hóa nút giảm khi quantity = 1
     }
 
-    async function addToCart(productId, quantity) {
-      try {
-        const response = await fetch('/Cart/AddToCart', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({ productId, quantity })
-        });
+    function validateRatingForm() {
+      const ratingInputs = document.querySelectorAll('input[name="RatingValue"]');
+      const ratingError = document.getElementById('ratingError');
+      const isRatingSelected = Array.from(ratingInputs).some(input => input.checked);
 
-        const result = await response.json();
-        if (result.success) {
-          showToast(`Đã thêm sản phẩm vào giỏ hàng! Tổng số lượng: ${result.totalItems}`, 'success');
-          updateCartIcon();
-        } else {
-          showToast(result.message, 'error');
-        }
-      } catch (error) {
-        console.error('Error adding to cart:', error);
-        showToast('Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng', 'error');
+      if (!isRatingSelected) {
+        ratingError.classList.remove('hidden');
+        showToast("Vui lòng chọn số sao!", "error");
+        return false;
       }
+
+      ratingError.classList.add('hidden');
+      return true;
     }
   </script>
 }
