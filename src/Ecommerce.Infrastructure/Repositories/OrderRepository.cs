@@ -111,12 +111,17 @@ public class OrderRepository : IOrderRepository
         .Where(o => o.UserId == userId)
         .ToListAsync();
 
-    if (orders.Count == 0)
-    {
+    if (!orders.Any())
       return false;
-    }
+
+    var orderIds = orders.Select(o => o.Id).ToList();
+    var orderItems = await _context.OrderItems
+        .Where(oi => orderIds.Contains(oi.OrderId))
+        .ToListAsync();
+    _context.OrderItems.RemoveRange(orderItems);
 
     _context.Orders.RemoveRange(orders);
+    await _context.SaveChangesAsync();
     return true;
   }
 
